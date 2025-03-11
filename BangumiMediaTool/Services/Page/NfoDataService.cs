@@ -73,11 +73,11 @@ public static class NfoDataService
     /// <param name="infoList">元数据列表</param>
     /// <param name="searchMode">搜索模式 0:剧集 1:电影</param>
     /// <param name="fileOperateMode">文件操作模式 0:硬链接 1:复制 2:重命名 3:仅生成元数据</param>
-    /// <param name="specialText"></param>
+    /// <param name="nfoExtraSettings">额外设置</param>
     /// <returns></returns>
     public static List<DataFilePath> CreateNewFileList(
         List<DataFilePath> sourceFileList, List<DataEpisodesInfo> infoList,
-        int searchMode, int fileOperateMode, string specialText)
+        int searchMode, int fileOperateMode, NfoExtraSettings nfoExtraSettings)
     {
         //集数补零
         var padLeft = Math.Min(sourceFileList.Count, infoList.Count).ToString().Length;
@@ -111,17 +111,20 @@ public static class NfoDataService
             var newPath = string.Empty;
             var newName = string.Empty;
 
+            var seasonNum = 1 + nfoExtraSettings.SeasonOffset;
+            if (seasonNum < 0) seasonNum = 0;
+
             switch (searchMode)
             {
                 case 0:
                     newName = fileOperateMode switch
                     {
                         3 => sourceFileList[i].FileName,
-                        _ => CreateFileService.BangumiNewFileName(info, sourceFileList[i], specialText, padLeft)
+                        _ => CreateFileService.BangumiNewFileName(info, sourceFileList[i], nfoExtraSettings, padLeft)
                     };
                     newPath = fileOperateMode switch
                     {
-                        0 or 1 => Path.Combine(targetFolder, CreateFileService.NewFolderName(info), info.Type == 0 ? "Season 1" : "SP")
+                        0 or 1 => Path.Combine(targetFolder, CreateFileService.NewFolderName(info), info.Type == 0 ? $"Season {seasonNum}" : "SP")
                             .RemoveInvalidPathNameChar(),
                         2 or 3 => targetFolder,
                         _ => newPath
@@ -131,7 +134,7 @@ public static class NfoDataService
                     newName = fileOperateMode switch
                     {
                         3 => sourceFileList[i].FileName,
-                        _ => CreateFileService.MovieNewFileName(info, sourceFileList[i], specialText)
+                        _ => CreateFileService.MovieNewFileName(info, sourceFileList[i], nfoExtraSettings)
                     };
                     newPath = fileOperateMode switch
                     {
@@ -228,7 +231,9 @@ public static class NfoDataService
     /// <param name="newFileList">新媒体文件路径</param>
     /// <param name="searchMode">搜索模式 0:剧集 1:电影</param>
     /// <param name="isAddTmdbId">添加TmdbId</param>
-    public static async Task RunCreateNfoFiles(List<DataEpisodesInfo> infoList, List<DataFilePath> newFileList, int searchMode, bool isAddTmdbId)
+    /// <param name="nfoExtraSettings">额外设置</param>
+    public static async Task RunCreateNfoFiles(List<DataEpisodesInfo> infoList, List<DataFilePath> newFileList,
+        int searchMode, bool isAddTmdbId, NfoExtraSettings nfoExtraSettings)
     {
         var count = Math.Min(infoList.Count, newFileList.Count);
 
@@ -264,6 +269,10 @@ public static class NfoDataService
                 if (string.IsNullOrEmpty(folder)) continue;
                 var epNfoPath = Path.Combine(folder, epFile);
 
+                var seasonNum = 1 + nfoExtraSettings.SeasonOffset;
+                if (info.Type != 0) seasonNum = nfoExtraSettings.SeasonOffset;
+                if (seasonNum < 0) seasonNum = 0;
+
                 switch (searchMode)
                 {
                     case 0:
@@ -274,8 +283,8 @@ public static class NfoDataService
                             title = info.NameCn,
                             originaltitle = info.Name,
                             showtitle = info.NameCn,
-                            episode = info.Sort.ToString(),
-                            season = info.Type == 0 ? "1" : "0",
+                            episode = (info.Sort + nfoExtraSettings.EpisodeOffset).ToString(),
+                            season = seasonNum.ToString(),
                         };
                         CreateFileService.CreateNfoFromData(nfoData, epNfoPath);
                         break;

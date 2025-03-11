@@ -44,15 +44,19 @@ public static class CreateFileService
     /// </summary>
     /// <param name="info">元数据</param>
     /// <param name="sourceFileName">源文件名</param>
-    /// <param name="specialText"></param>
+    /// <param name="nfoExtraSettings">额外设置</param>
     /// <param name="padLeft">剧集编号左侧填0的数量</param>
     /// <returns></returns>
-    public static string BangumiNewFileName(DataEpisodesInfo info, DataFilePath sourceFileName, string specialText, int padLeft)
+    public static string BangumiNewFileName(DataEpisodesInfo info, DataFilePath sourceFileName, NfoExtraSettings nfoExtraSettings, int padLeft)
     {
         var fileName = sourceFileName.FileName;
         var extensionName = Path.GetExtension(fileName);
         var templateFileName = GlobalConfig.Instance.AppConfig.CreateBangumiFileNameTemplate;
         if (padLeft < 2) padLeft = 2;
+
+        var seasonNum = 1 + nfoExtraSettings.SeasonOffset;
+        if (info.Type != 0) seasonNum = nfoExtraSettings.SeasonOffset;
+        if (seasonNum < 0) seasonNum = 0;
 
         var data = new
         {
@@ -62,11 +66,11 @@ public static class CreateFileService
             EpisodeId = info.Id,
             EpisodeName = info.Name,
             EpisodeNameCn = info.NameCn,
-            EpisodesSort = (info.Type == 0 ? "S01E" : "S00E") + info.Sort.ToString().PadLeft(padLeft, '0'),
+            EpisodesSort = $"S{seasonNum}E" + (info.Sort + nfoExtraSettings.EpisodeOffset).ToString().PadLeft(padLeft, '0'),
             Year = info.Year,
             SourceFileName = Path.GetFileNameWithoutExtension(sourceFileName.FileName),
             SourceFolderName = Path.GetFileName(Path.GetDirectoryName(sourceFileName.FilePath)),
-            SpecialText = specialText,
+            SpecialText = nfoExtraSettings.SpecialText,
         };
 
         var fileNameParser = new FluidParser();
@@ -85,9 +89,9 @@ public static class CreateFileService
     /// </summary>
     /// <param name="info">元数据</param>
     /// <param name="sourceFileName">源文件名</param>
-    /// <param name="specialText"></param>
+    /// <param name="nfoExtraSettings">额外设置</param>
     /// <returns></returns>
-    public static string MovieNewFileName(DataEpisodesInfo info, DataFilePath sourceFileName, string specialText)
+    public static string MovieNewFileName(DataEpisodesInfo info, DataFilePath sourceFileName, NfoExtraSettings nfoExtraSettings)
     {
         var fileName = sourceFileName.FileName;
         var extensionName = Path.GetExtension(fileName);
@@ -104,7 +108,7 @@ public static class CreateFileService
             Year = info.Year,
             SourceFileName = Path.GetFileNameWithoutExtension(sourceFileName.FileName),
             SourceFolderName = Path.GetFileName(Path.GetDirectoryName(sourceFileName.FilePath)),
-            SpecialText = specialText,
+            SpecialText = nfoExtraSettings.SpecialText,
         };
 
         var fileNameParser = new FluidParser();

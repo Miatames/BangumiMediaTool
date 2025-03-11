@@ -21,7 +21,12 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     [ObservableProperty] private bool _isAddTmdbId = true;
     [ObservableProperty] private int _currentSearchMode = 0;
     [ObservableProperty] private int _currentFileOperateMode = 0;
+
+    [ObservableProperty] private int _extraSettingsWidth = 0;
+    [ObservableProperty] private bool _isExtraSettingsOn = false;
     [ObservableProperty] private string _specialText = string.Empty;
+    [ObservableProperty] private int _seasonOffset = 0;
+    [ObservableProperty] private int _episodeOffset = 0;
 
     public void OnNavigatedTo() { }
     public void OnNavigatedFrom() { }
@@ -113,7 +118,8 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     [RelayCommand]
     private void OnNavigateToPreviewWindow()
     {
-        var list = NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(), CurrentSearchMode, CurrentFileOperateMode, SpecialText);
+        var list = NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(), CurrentSearchMode, CurrentFileOperateMode,
+            new NfoExtraSettings() { SpecialText = SpecialText, SeasonOffset = SeasonOffset, EpisodeOffset = EpisodeOffset });
         var window = new FilePreviewWindow(new FilePreviewWindowViewModel(list))
         {
             Owner = App.GetService<MainWindow>(),
@@ -127,7 +133,10 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     {
         SourceFileList.Clear();
         NfoDataList.Clear();
+
         SpecialText = string.Empty;
+        SeasonOffset = 0;
+        EpisodeOffset = 0;
     }
 
     [RelayCommand]
@@ -137,9 +146,14 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
         main?.SetGlobalProcess(true);
 
         var newFileList =
-            NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(), CurrentSearchMode, CurrentFileOperateMode, SpecialText);
+            NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(), CurrentSearchMode, CurrentFileOperateMode,
+                new NfoExtraSettings() { SpecialText = SpecialText, SeasonOffset = SeasonOffset, EpisodeOffset = EpisodeOffset });
         var record = await NfoDataService.RunFileOperates(SourceFileList.ToList(), newFileList, CurrentFileOperateMode);
-        if (IsAddNfoFile) await NfoDataService.RunCreateNfoFiles(NfoDataList.ToList(), newFileList, CurrentSearchMode, IsAddTmdbId);
+        if (IsAddNfoFile)
+        {
+            await NfoDataService.RunCreateNfoFiles(NfoDataList.ToList(), newFileList, CurrentSearchMode, IsAddTmdbId,
+                new NfoExtraSettings() { SpecialText = SpecialText, SeasonOffset = SeasonOffset, EpisodeOffset = EpisodeOffset });
+        }
 
         main?.SetGlobalProcess(false);
 
@@ -205,5 +219,18 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
         var list = SourceFileList.ToList()
             .OrderBy(path => path.FilePath, StringComparer.OrdinalIgnoreCase.WithNaturalSort());
         SourceFileList = new ObservableCollection<DataFilePath>(list);
+    }
+
+    [RelayCommand]
+    private void OnExtraSettingsShow()
+    {
+        if (IsExtraSettingsOn)
+        {
+            ExtraSettingsWidth = 160;
+        }
+        else
+        {
+            ExtraSettingsWidth = 0;
+        }
     }
 }
