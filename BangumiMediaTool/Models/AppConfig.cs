@@ -32,6 +32,9 @@ public class AppConfig : ObservableObject
     //qBittorrent下载路径
     public string QbtDefaultDownloadPath { get; set; } = string.Empty;
 
+    //Bangumi Api Assess Token
+    public string BangumiAuthToken { get; set; } = string.Empty;
+
     //FFmpeg文件夹路径
     public string FFmpegPath { get; set; } = string.Empty;
 

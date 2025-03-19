@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using BangumiMediaTool.Models;
 using BangumiMediaTool.Services.Program;
@@ -25,6 +26,10 @@ public class BangumiApiService
         });
         bgmApiClient.DefaultRequestHeaders.Add("Accept", "application/json");
         bgmApiClient.DefaultRequestHeaders.Add("User-Agent", "miatames/bangumi-media-tool (https://github.com/Miatames/BangumiMediaTool)");
+        if (!string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken))
+        {
+            bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
+        }
         bgmApiClient.Timeout = TimeSpan.FromSeconds(10);
 
         tmdbApiClient = new HttpClient();
@@ -111,6 +116,11 @@ public class BangumiApiService
         HttpResponseMessage response;
         try
         {
+            if (!string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization == null)
+            {
+               bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
+            }
+
             response = await bgmApiClient.GetAsync(url);
         }
         catch (Exception e)
@@ -203,6 +213,11 @@ public class BangumiApiService
 
         try
         {
+            if (!string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization == null)
+            {
+                bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
+            }
+
             var response = await bgmApiClient.GetAsync(url);
             Logs.LogInfo($"请求: {url} : {response.StatusCode}");
             if (!response.IsSuccessStatusCode) return [];

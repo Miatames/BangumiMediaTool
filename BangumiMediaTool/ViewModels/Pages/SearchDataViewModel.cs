@@ -113,10 +113,17 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
             var main = App.GetService<MainWindowViewModel>();
             main?.SetGlobalProcess(true);
             var list = await BangumiApiService.Instance.BangumiApi_Episodes(SearchListSelectItem);
-            DataEpisodesInfoList = new ObservableCollection<DataEpisodesInfo>(list);
             main?.SetGlobalProcess(false);
-
-            nfoPage?.AddToNfoData(list);
+            if (list.Count != 0)
+            {
+                DataEpisodesInfoList = new ObservableCollection<DataEpisodesInfo>(list);
+                nfoPage?.AddToNfoData(list);
+                WeakReferenceMessenger.Default.Send(new DataSnackbarMessage("添加到元数据", string.Empty, ControlAppearance.Success));
+            }
+            else
+            {
+                WeakReferenceMessenger.Default.Send(new DataSnackbarMessage("获取剧集信息失败", string.Empty, ControlAppearance.Caution));
+            }
         }
         else
         {
@@ -131,6 +138,8 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
             {
                 nfoPage?.AddToNfoData(episodesInfoSelectItems.ToList());
             }
+
+            WeakReferenceMessenger.Default.Send(new DataSnackbarMessage("添加到元数据", string.Empty, ControlAppearance.Success));
         }
     }
 

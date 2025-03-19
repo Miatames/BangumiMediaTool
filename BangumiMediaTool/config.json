@@ -9,5 +9,6 @@
 	"CreateMovieFileNameTemplate": "{{SourceFileName}}",
 	"QbtWebServerUrl": "http://127.0.0.1:8080/",
 	"QbtDefaultDownloadPath": "G:\\Media",
+	"BangumiAuthToken": "",
 	"FFmpegPath": "C:\\Users\\Administrator\\Application\\ffmpeg-6.0-full_build\\bin"
 }

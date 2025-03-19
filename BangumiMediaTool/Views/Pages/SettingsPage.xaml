@@ -39,6 +39,8 @@
             <ui:TextBox Text="{Binding ViewModel.AppConfig.QbtWebServerUrl}" />
             <Label Margin="0,10,0,0" Content="qBittorrent下载路径:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.QbtDefaultDownloadPath}" />
+            <Label Margin="0,10,0,0" Content="BangumiApi 令牌:" />
+            <ui:TextBox Text="{Binding ViewModel.AppConfig.BangumiAuthToken}" />
             <Label Margin="0,10,0,0" Content="FFmpeg文件夹路径:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.FFmpegPath}" />
 

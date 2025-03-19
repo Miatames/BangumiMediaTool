@@ -44,6 +44,7 @@ public class GlobalConfig
                 CreateBangumiFileNameTemplate = "{{SubjectNameCn}} - {{EpisodesSort}} - {{EpisodeNameCn}} - {{SourceFileName}}",
                 CreateMovieFileNameTemplate = "{{SourceFileName}}",
                 QbtWebServerUrl = "http://127.0.0.1:8080/",
+                BangumiAuthToken = "",
                 QbtDefaultDownloadPath = "G:\\Media",
                 FFmpegPath = ""
             };
