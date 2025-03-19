@@ -48,7 +48,7 @@ public class BgmApiJson_EpisodesInfoListItem
 {
     public string name { get; set; } = string.Empty;
     public string name_cn { get; set; } = string.Empty;
-    public int ep { get; set; }
+    public float ep { get; set; }
     public float sort { get; set; }
     public long id { get; set; }
     public long subject_id { get; set; }

@@ -33,7 +33,7 @@ public class DataEpisodesInfo
     /// <summary>
     /// 序号（特别篇固定为0）
     /// </summary>
-    public int Ep { get; init; } = 0;
+    public float Ep { get; init; } = 0;
 
     /// <summary>
     /// 序号
@@ -81,7 +81,7 @@ public class DataEpisodesInfo
                && NameCn == other.NameCn
                && SubjectName == other.SubjectName
                && SubjectNameCn == other.SubjectNameCn
-               && Ep == other.Ep
+               && Math.Abs(Ep - other.Ep) < 1e-6
                && Math.Abs(Sort - other.Sort) < 1e-6
                && SubjectId == other.SubjectId
                && TmdbSubjectId == other.TmdbSubjectId
