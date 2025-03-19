@@ -83,6 +83,11 @@ public static class NfoDataService
         var padLeft = Math.Min(sourceFileList.Count, infoList.Count).ToString().Length;
         var newFileList = new List<DataFilePath>();
 
+        //sp季和第0季文件夹
+        var spFolderStr = GlobalConfig.Instance.AppConfig.CustomSpName;
+        if (string.IsNullOrEmpty(spFolderStr)) spFolderStr = "SP";
+
+
         for (int i = 0; i < Math.Min(sourceFileList.Count, infoList.Count); i++)
         {
             var sourcePath = sourceFileList[i].FilePath;
@@ -124,7 +129,9 @@ public static class NfoDataService
                     };
                     newPath = fileOperateMode switch
                     {
-                        0 or 1 => Path.Combine(targetFolder, CreateFileService.NewFolderName(info), info.Type == 0 ? $"Season {seasonNum}" : "SP")
+                        0 or 1 => Path.Combine(targetFolder,
+                                CreateFileService.NewFolderName(info),
+                                info.Type == 0 && seasonNum > 0 ? $"Season {seasonNum}" : spFolderStr)
                             .RemoveInvalidPathNameChar(),
                         2 or 3 => targetFolder,
                         _ => newPath

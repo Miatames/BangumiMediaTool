@@ -10,5 +10,6 @@
 	"QbtWebServerUrl": "http://127.0.0.1:8080/",
 	"QbtDefaultDownloadPath": "G:\\Media",
 	"BangumiAuthToken": "",
+	"CustomSpName": "SP",
 	"FFmpegPath": "C:\\Users\\Administrator\\Application\\ffmpeg-6.0-full_build\\bin"
 }

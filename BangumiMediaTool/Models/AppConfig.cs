@@ -35,6 +35,9 @@ public class AppConfig : ObservableObject
     //Bangumi Api Assess Token
     public string BangumiAuthToken { get; set; } = string.Empty;
 
+    //自定义特别季名称
+    public string CustomSpName { get; set; } = string.Empty;
+
     //FFmpeg文件夹路径
     public string FFmpegPath { get; set; } = string.Empty;
 

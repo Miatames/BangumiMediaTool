@@ -45,6 +45,7 @@ public class GlobalConfig
                 CreateMovieFileNameTemplate = "{{SourceFileName}}",
                 QbtWebServerUrl = "http://127.0.0.1:8080/",
                 BangumiAuthToken = "",
+                CustomSpName = "SP",
                 QbtDefaultDownloadPath = "G:\\Media",
                 FFmpegPath = ""
             };

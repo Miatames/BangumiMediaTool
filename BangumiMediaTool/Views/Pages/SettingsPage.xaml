@@ -41,6 +41,8 @@
             <ui:TextBox Text="{Binding ViewModel.AppConfig.QbtDefaultDownloadPath}" />
             <Label Margin="0,10,0,0" Content="BangumiApi 令牌:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.BangumiAuthToken}" />
+            <Label Margin="0,10,0,0" Content="自定义特别季（第0季）名称:" />
+            <ui:TextBox Text="{Binding ViewModel.AppConfig.CustomSpName}" />
             <Label Margin="0,10,0,0" Content="FFmpeg文件夹路径:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.FFmpegPath}" />
 
