@@ -120,6 +120,10 @@ public class BangumiApiService
             {
                bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
             }
+            else if (string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization !=null)
+            {
+                bgmApiClient.DefaultRequestHeaders.Authorization = null;
+            }
 
             response = await bgmApiClient.GetAsync(url);
         }
@@ -216,6 +220,10 @@ public class BangumiApiService
             if (!string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization == null)
             {
                 bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
+            }
+            else if (string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization !=null)
+            {
+                bgmApiClient.DefaultRequestHeaders.Authorization = null;
             }
 
             var response = await bgmApiClient.GetAsync(url);
