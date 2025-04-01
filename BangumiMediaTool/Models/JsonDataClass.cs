@@ -89,6 +89,12 @@ public class NfoInfo_SubjectsRootTv
     public string year{ get; set; } = string.Empty;
 }
 
+[XmlRoot("season")]
+public class NfoInfo_SubjectsRootSeason
+{
+    public string bangumiid { get; set; } = string.Empty;
+}
+
 [XmlRoot("movie")]
 public class NfoInfo_SubjectsRootMovie
 {

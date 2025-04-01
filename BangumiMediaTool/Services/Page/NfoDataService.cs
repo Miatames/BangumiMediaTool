@@ -270,6 +270,15 @@ public static class NfoDataService
                         };
                         CreateFileService.CreateNfoFromData(subjectNfoData, Path.Combine(subjectFolder, "tvshow.nfo"));
                     }
+
+                    if (!string.IsNullOrEmpty(folder) && !File.Exists(Path.Combine(folder,"season.nfo")))
+                    {
+                        var seasonNfoData = new NfoInfo_SubjectsRootSeason
+                        {
+                            bangumiid = info.SubjectId.ToString()
+                        };
+                        CreateFileService.CreateNfoFromData(seasonNfoData, Path.Combine(folder, "season.nfo"));
+                    }
                 }
 
                 var epFile = Path.GetFileNameWithoutExtension(newMediaFile.FileName) + ".nfo";
