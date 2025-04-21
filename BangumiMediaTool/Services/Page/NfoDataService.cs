@@ -72,7 +72,7 @@ public static class NfoDataService
     /// <param name="sourceFileList">源文件列表</param>
     /// <param name="infoList">元数据列表</param>
     /// <param name="searchMode">搜索模式 0:剧集 1:电影</param>
-    /// <param name="fileOperateMode">文件操作模式 0:硬链接 1:复制 2:重命名 3:仅生成元数据</param>
+    /// <param name="fileOperateMode">文件操作模式 0:硬链接 1:STRM 2:复制 3:重命名 4:仅生成元数据</param>
     /// <param name="nfoExtraSettings">额外设置</param>
     /// <returns></returns>
     public static List<DataFilePath> CreateNewFileList(
@@ -104,7 +104,7 @@ public static class NfoDataService
             //重命名使用原文件夹，其他使用配置中的文件夹
             var targetFolder = fileOperateMode switch
             {
-                2 or 3 => Path.GetDirectoryName(sourcePath),
+                3 or 4 => Path.GetDirectoryName(sourcePath),
                 _ => Path.Combine(rootPath, GlobalConfig.Instance.AppConfig.DefaultHardLinkPath)
             };
             if (string.IsNullOrEmpty(targetFolder))
@@ -124,31 +124,33 @@ public static class NfoDataService
                 case 0:
                     newName = fileOperateMode switch
                     {
-                        3 => sourceFileList[i].FileName,
+                        1 => Path.GetFileNameWithoutExtension(CreateFileService.BangumiNewFileName(info, sourceFileList[i], nfoExtraSettings, padLeft)) + ".strm",
+                        4 => sourceFileList[i].FileName,
                         _ => CreateFileService.BangumiNewFileName(info, sourceFileList[i], nfoExtraSettings, padLeft)
                     };
                     newPath = fileOperateMode switch
                     {
-                        0 or 1 => Path.Combine(targetFolder,
+                        0 or 1 or 2 => Path.Combine(targetFolder,
                                 CreateFileService.NewFolderName(info),
                                 info.Type == 0 && seasonNum > 0 ? $"Season {seasonNum}" : spFolderStr)
                             .RemoveInvalidPathNameChar(),
-                        2 or 3 => targetFolder,
+                        3 or 4 => targetFolder,
                         _ => newPath
                     };
                     break;
                 case 1:
                     newName = fileOperateMode switch
                     {
-                        3 => sourceFileList[i].FileName,
+                        1 => Path.GetFileNameWithoutExtension(CreateFileService.MovieNewFileName(info, sourceFileList[i], nfoExtraSettings)) + ".strm",
+                        4 => sourceFileList[i].FileName,
                         _ => CreateFileService.MovieNewFileName(info, sourceFileList[i], nfoExtraSettings)
                     };
                     newPath = fileOperateMode switch
                     {
-                        0 or 1 => Path.Combine(
+                        0 or 1 or 2 => Path.Combine(
                             targetFolder,
                             CreateFileService.NewFolderName(info)).RemoveInvalidPathNameChar(),
-                        2 or 3 => targetFolder,
+                        3 or 4 => targetFolder,
                         _ => newPath
                     };
                     break;
@@ -165,7 +167,7 @@ public static class NfoDataService
     /// </summary>
     /// <param name="sourceFileList">原文件路径</param>
     /// <param name="newFileList">目标路径</param>
-    /// <param name="fileOperateMode">0:硬链接 1:复制 2:重命名 3:仅生成元数据</param>
+    /// <param name="fileOperateMode">文件操作模式 0:硬链接 1:STRM 2:复制 3:重命名 4:仅生成元数据</param>
     public static async Task<string> RunFileOperates(List<DataFilePath> sourceFileList, List<DataFilePath> newFileList, int fileOperateMode)
     {
         var main = App.GetService<MainWindowViewModel>();
@@ -206,17 +208,22 @@ public static class NfoDataService
                             Logs.LogInfo($"硬链接：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
-                        case 1: //复制
+                        case 1: //STRM
+                            File.WriteAllText(newFileList[i].FilePath,sourceFileList[i].FilePath);
+                            Logs.LogInfo($"生成STRM：{newFileList[i].FilePath}");
+                            record.AppendLine(newFileList[i].FilePath);
+                            break;
+                        case 2: //复制
                             File.Copy(sourceFileList[i].FilePath, newFileList[i].FilePath, true);
                             Logs.LogInfo($"复制：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
-                        case 2: //重命名
+                        case 3: //重命名
                             File.Move(sourceFileList[i].FilePath, newFileList[i].FilePath, true);
                             Logs.LogInfo($"重命名：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
-                        case 3: //仅生成元数据
+                        case 4: //仅生成元数据
                             record.AppendLine(newFileList[i].FilePath);
                             break;
                     }
@@ -271,7 +278,7 @@ public static class NfoDataService
                         CreateFileService.CreateNfoFromData(subjectNfoData, Path.Combine(subjectFolder, "tvshow.nfo"));
                     }
 
-                    if (!string.IsNullOrEmpty(folder) && !File.Exists(Path.Combine(folder,"season.nfo")))
+                    if (!string.IsNullOrEmpty(folder) && !File.Exists(Path.Combine(folder, "season.nfo")))
                     {
                         var seasonNfoData = new NfoInfo_SubjectsRootSeason
                         {

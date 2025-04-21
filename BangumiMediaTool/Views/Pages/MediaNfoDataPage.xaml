@@ -150,6 +150,7 @@
                       MinWidth="140"
                       HorizontalAlignment="Right">
                 <ComboBoxItem Content="硬链接" />
+                <ComboBoxItem Content="生成STRM" />
                 <ComboBoxItem Content="复制" />
                 <ComboBoxItem Content="重命名" />
                 <ComboBoxItem Content="仅生成元数据" />
