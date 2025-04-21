@@ -19,6 +19,7 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
 
     [ObservableProperty] private bool _isAddNfoFile = true;
     [ObservableProperty] private bool _isAddTmdbId = true;
+    [ObservableProperty] private bool _isGetThumb = false;
     [ObservableProperty] private int _currentSearchMode = 0;
     [ObservableProperty] private int _currentFileOperateMode = 0;
 
@@ -153,6 +154,11 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
         {
             await NfoDataService.RunCreateNfoFiles(NfoDataList.ToList(), newFileList, CurrentSearchMode, IsAddTmdbId,
                 new NfoExtraSettings() { SpecialText = SpecialText, SeasonOffset = SeasonOffset, EpisodeOffset = EpisodeOffset });
+        }
+
+        if (IsGetThumb)
+        {
+            await CreateFileService.RunCreateThumbFiles(SourceFileList.ToList(), newFileList);
         }
 
         main?.SetGlobalProcess(false);

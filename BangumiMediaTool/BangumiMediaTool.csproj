@@ -27,6 +27,8 @@
         <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135"/>
         <PackageReference Include="NaturalSort.Extension" Version="4.3.0" />
         <PackageReference Include="NLog.WPF" Version="1.2.6"/>
+        <PackageReference Include="System.Drawing.Common" Version="9.0.4" />
+        <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
         <PackageReference Include="WPF-UI" Version="3.0.5"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>

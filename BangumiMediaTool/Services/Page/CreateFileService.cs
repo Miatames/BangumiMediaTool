@@ -1,10 +1,13 @@
-﻿using System.IO;
+﻿using System.Drawing.Imaging;
+using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using BangumiMediaTool.Models;
 using BangumiMediaTool.Services.Program;
+using BangumiMediaTool.ViewModels.Windows;
 using Fluid;
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace BangumiMediaTool.Services.Page;
 
@@ -143,5 +146,40 @@ public static class CreateFileService
         {
             Logs.LogError(e.ToString());
         }
+    }
+
+    /// <summary>
+    /// 生成视频预览图
+    /// </summary>
+    /// <param name="sourceFileList">源文件路径</param>
+    /// <param name="newFileList">目标文件路径</param>
+    public static async Task RunCreateThumbFiles(List<DataFilePath> sourceFileList, List<DataFilePath> newFileList)
+    {
+        var main = App.GetService<MainWindowViewModel>();
+        var count = Math.Min(sourceFileList.Count, newFileList.Count);
+
+        await Task.Run(() =>
+        {
+            for (int i = 0; i < count; i++)
+            {
+                main?.SetGlobalProcess(true, i + 1, count);
+
+                var sourceMediaFile = sourceFileList[i].FilePath;
+                var newThumbFile = Path.Combine(
+                    Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
+                    Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.png");
+
+                try
+                {
+                    var shellFile = ShellFile.FromFilePath(sourceMediaFile);
+                    var thumbData = shellFile.Thumbnail.ExtraLargeBitmap;
+                    thumbData?.Save(newThumbFile, ImageFormat.Png);
+                }
+                catch (Exception e)
+                {
+                    Logs.LogError(e.ToString());
+                }
+            }
+        });
     }
 }

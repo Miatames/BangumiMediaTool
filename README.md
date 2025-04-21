@@ -4,6 +4,7 @@
 使用[TMDBApi](https://developer.themoviedb.org/docs/getting-started)和[BangumiApi](https://github.com/bangumi/api)获取视频信息并生成nfo文件  
 批量重命名字幕文件  
 ass字幕转srt（需要配置ffmpeg路径）（详见Wiki说明）  
+获取视频文件缩略图  
 
 ### 测试环境：
 Win11  
@@ -18,3 +19,4 @@ JetBrains Rider 2024.3
 [FFMpegCore](https://github.com/rosenbjerg/FFMpegCore)  
 [NaturalSort.Extension](https://github.com/tompazourek/NaturalSort.Extension)  
 [NLog.WPF](https://github.com/limumu1997/NLog.WPF)  
+[WindowsAPICodePack-Shell](https://github.com/aybe/Windows-API-Code-Pack-1.1)  

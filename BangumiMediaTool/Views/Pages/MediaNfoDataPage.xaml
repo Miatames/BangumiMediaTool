@@ -142,6 +142,11 @@
                       IsEnabled="{Binding ViewModel.IsAddNfoFile}"
                       Margin="0,5,8,5"
                       IsChecked="{Binding ViewModel.IsAddTmdbId,Mode=TwoWay}" />
+            <CheckBox x:Name="UI_IsGetThumb"
+                      Content="获取视频封面"
+                      HorizontalAlignment="Right"
+                      Margin="0,5,8,5"
+                      IsChecked="{Binding ViewModel.IsGetThumb,Mode=TwoWay}" />
             <!-- ToolTip="快速搜索匹配剧集时,在元数据中填入默认匹配的剧集的Tmdb ID" -->
             <ComboBox x:Name="UI_FileOperateMode"
                       SelectedIndex="{Binding ViewModel.CurrentFileOperateMode,Mode=TwoWay}"

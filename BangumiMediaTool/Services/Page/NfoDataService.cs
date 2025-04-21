@@ -209,7 +209,7 @@ public static class NfoDataService
                             record.AppendLine(newFileList[i].FilePath);
                             break;
                         case 1: //STRM
-                            File.WriteAllText(newFileList[i].FilePath,sourceFileList[i].FilePath);
+                            File.WriteAllText(newFileList[i].FilePath, sourceFileList[i].FilePath);
                             Logs.LogInfo($"生成STRM：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
