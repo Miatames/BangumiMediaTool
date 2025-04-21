@@ -58,7 +58,7 @@ public static class CreateFileService
         if (info.Type != 0) seasonNum = nfoExtraSettings.SeasonOffset;
         if (seasonNum < 0) seasonNum = 0;
         var seasonNumStr = seasonNum.ToString();
-        if (seasonNum<10) seasonNumStr = "0" + seasonNumStr;
+        if (seasonNum < 10) seasonNumStr = "0" + seasonNumStr;
 
         var data = new
         {
@@ -67,7 +67,7 @@ public static class CreateFileService
             SubjectNameCn = info.SubjectNameCn,
             EpisodeId = info.Id,
             EpisodeName = info.Name,
-            EpisodeNameCn = info.NameCn,
+            EpisodeNameCn = string.IsNullOrEmpty(info.NameCn) ? info.Name : info.NameCn,
             EpisodesSort = $"S{seasonNumStr}E" + (info.Sort + nfoExtraSettings.EpisodeOffset).ToString().PadLeft(padLeft, '0'),
             Year = info.Year,
             SourceFileName = Path.GetFileNameWithoutExtension(sourceFileName.FileName),
@@ -106,7 +106,7 @@ public static class CreateFileService
             SubjectNameCn = info.SubjectNameCn,
             EpisodeId = info.Id,
             EpisodeName = info.Name,
-            EpisodeNameCn = info.NameCn,
+            EpisodeNameCn = string.IsNullOrEmpty(info.NameCn) ? info.Name : info.NameCn,
             Year = info.Year,
             SourceFileName = Path.GetFileNameWithoutExtension(sourceFileName.FileName),
             SourceFolderName = Path.GetFileName(Path.GetDirectoryName(sourceFileName.FilePath)),
