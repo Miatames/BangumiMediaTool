@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using BangumiMediaTool.Models;
 using BangumiMediaTool.Services.Program;
 using BangumiMediaTool.ViewModels.Windows;
+using FFMpegCore;
 using Fluid;
 using Microsoft.WindowsAPICodePack.Shell;
 
@@ -158,8 +159,10 @@ public static class CreateFileService
         var main = App.GetService<MainWindowViewModel>();
         var count = Math.Min(sourceFileList.Count, newFileList.Count);
 
-        await Task.Run(() =>
+        //存在FFmpeg时优先使用
+        if (File.Exists(GlobalFFOptions.GetFFProbeBinaryPath()) && File.Exists(GlobalFFOptions.GetFFMpegBinaryPath()))
         {
+            Logs.LogInfo("ffmpeg.exe process is already running");
             for (int i = 0; i < count; i++)
             {
                 main?.SetGlobalProcess(true, i + 1, count);
@@ -169,17 +172,46 @@ public static class CreateFileService
                     Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
                     Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.png");
 
-                try
+
+                var mediaInfo = await FFProbe.AnalyseAsync(sourceFileList[i].FilePath);
+                if (mediaInfo.PrimaryVideoStream == null)
                 {
-                    var shellFile = ShellFile.FromFilePath(sourceMediaFile);
-                    var thumbData = shellFile.Thumbnail.ExtraLargeBitmap;
-                    thumbData?.Save(newThumbFile, ImageFormat.Png);
+                    Logs.LogInfo($"{sourceFileList[i].FilePath} is missing primary video stream");
+                    continue;
                 }
-                catch (Exception e)
-                {
-                    Logs.LogError(e.ToString());
-                }
+
+                var duration = mediaInfo.Duration.TotalSeconds;
+                var cutTime = Math.Round(duration / 2.0);
+                var size = new System.Drawing.Size(mediaInfo.PrimaryVideoStream.Width, mediaInfo.PrimaryVideoStream.Height);
+
+                await FFMpeg.SnapshotAsync(sourceMediaFile, newThumbFile, size, TimeSpan.FromSeconds(cutTime));
             }
-        });
+        }
+        else
+        {
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    main?.SetGlobalProcess(true, i + 1, count);
+
+                    var sourceMediaFile = sourceFileList[i].FilePath;
+                    var newThumbFile = Path.Combine(
+                        Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
+                        Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.png");
+
+                    try
+                    {
+                        var shellFile = ShellFile.FromFilePath(sourceMediaFile);
+                        var thumbData = shellFile.Thumbnail.ExtraLargeBitmap;
+                        thumbData?.Save(newThumbFile, ImageFormat.Png);
+                    }
+                    catch (Exception e)
+                    {
+                        Logs.LogError(e.ToString());
+                    }
+                }
+            });
+        }
     }
 }
