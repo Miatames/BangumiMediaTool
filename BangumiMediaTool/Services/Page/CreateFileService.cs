@@ -9,6 +9,7 @@ using BangumiMediaTool.ViewModels.Windows;
 using FFMpegCore;
 using Fluid;
 using Microsoft.WindowsAPICodePack.Shell;
+using Size = System.Drawing.Size;
 
 namespace BangumiMediaTool.Services.Page;
 
@@ -154,10 +155,11 @@ public static class CreateFileService
     /// </summary>
     /// <param name="sourceFileList">源文件路径</param>
     /// <param name="newFileList">目标文件路径</param>
-    public static async Task RunCreateThumbFiles(List<DataFilePath> sourceFileList, List<DataFilePath> newFileList)
+    public static async Task<string> RunCreateThumbFiles(List<DataFilePath> sourceFileList, List<DataFilePath> newFileList)
     {
         var main = App.GetService<MainWindowViewModel>();
         var count = Math.Min(sourceFileList.Count, newFileList.Count);
+        var record = new StringBuilder();
 
         //存在FFmpeg时优先使用
         if (File.Exists(GlobalFFOptions.GetFFProbeBinaryPath()) && File.Exists(GlobalFFOptions.GetFFMpegBinaryPath()))
@@ -168,23 +170,40 @@ public static class CreateFileService
                 main?.SetGlobalProcess(true, i + 1, count);
 
                 var sourceMediaFile = sourceFileList[i].FilePath;
+                if (Path.GetExtension(sourceFileList[i].FileName) == ".strm") //对strm文件使用原位置
+                {
+                    var p = await File.ReadAllTextAsync(sourceMediaFile);
+                    if (File.Exists(p))
+                    {
+                        sourceMediaFile = p;
+                    }
+                }
+
                 var newThumbFile = Path.Combine(
                     Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
                     Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.png");
 
 
-                var mediaInfo = await FFProbe.AnalyseAsync(sourceFileList[i].FilePath);
+                var mediaInfo = await FFProbe.AnalyseAsync(sourceMediaFile);
                 if (mediaInfo.PrimaryVideoStream == null)
                 {
-                    Logs.LogInfo($"{sourceFileList[i].FilePath} is missing primary video stream");
+                    Logs.LogInfo($"{sourceMediaFile} 无法获得媒体文件信息");
                     continue;
                 }
 
                 var duration = mediaInfo.Duration.TotalSeconds;
                 var cutTime = Math.Round(duration / 2.0);
-                var size = new System.Drawing.Size(mediaInfo.PrimaryVideoStream.Width, mediaInfo.PrimaryVideoStream.Height);
+                var size = new Size(mediaInfo.PrimaryVideoStream.Width, mediaInfo.PrimaryVideoStream.Height);
 
-                await FFMpeg.SnapshotAsync(sourceMediaFile, newThumbFile, size, TimeSpan.FromSeconds(cutTime));
+                try
+                {
+                    await FFMpeg.SnapshotAsync(sourceMediaFile, newThumbFile, size, TimeSpan.FromSeconds(cutTime));
+                    record.AppendLine(newThumbFile);
+                }
+                catch (Exception e)
+                {
+                    Logs.LogError(e.ToString());
+                }
             }
         }
         else
@@ -196,6 +215,15 @@ public static class CreateFileService
                     main?.SetGlobalProcess(true, i + 1, count);
 
                     var sourceMediaFile = sourceFileList[i].FilePath;
+                    if (Path.GetExtension(sourceFileList[i].FileName) == ".strm") //对strm文件使用原位置
+                    {
+                        var p = File.ReadAllText(sourceMediaFile);
+                        if (File.Exists(p))
+                        {
+                            sourceMediaFile = p;
+                        }
+                    }
+
                     var newThumbFile = Path.Combine(
                         Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
                         Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.png");
@@ -205,6 +233,7 @@ public static class CreateFileService
                         var shellFile = ShellFile.FromFilePath(sourceMediaFile);
                         var thumbData = shellFile.Thumbnail.ExtraLargeBitmap;
                         thumbData?.Save(newThumbFile, ImageFormat.Png);
+                        record.AppendLine(newThumbFile);
                     }
                     catch (Exception e)
                     {
@@ -213,5 +242,7 @@ public static class CreateFileService
                 }
             });
         }
+
+        return record.ToString();
     }
 }
