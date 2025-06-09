@@ -158,7 +158,14 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
 
         if (IsGetThumb)
         {
-            await CreateFileService.RunCreateThumbFiles(SourceFileList.ToList(), newFileList);
+            if (CurrentFileOperateMode == 4 && !IsAddNfoFile)
+            {
+                record = await CreateFileService.RunCreateThumbFiles(SourceFileList.ToList(), SourceFileList.ToList());
+            }
+            else
+            {
+                await CreateFileService.RunCreateThumbFiles(SourceFileList.ToList(), newFileList);
+            }
         }
 
         main?.SetGlobalProcess(false);
