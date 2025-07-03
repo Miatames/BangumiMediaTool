@@ -36,7 +36,7 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
     {
         if (BangumiName.Length == 0 || RssFeedPath.Length == 0 || GlobalConfig.Instance.AppConfig.QbtDefaultDownloadPath.Length == 0) return;
 
-        var folderPath = Path.Combine(GlobalConfig.Instance.AppConfig.QbtDefaultDownloadPath, BangumiName);
+        var folderPath = Path.Combine(GlobalConfig.Instance.AppConfig.QbtDefaultDownloadPath, BangumiName.RemoveInvalidFileNameChar());
 
         var dataAddRssRule = new DataAddRssRule()
         {
