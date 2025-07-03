@@ -323,6 +323,13 @@ public static class NfoDataService
                             year = info.Year
                         };
                         CreateFileService.CreateNfoFromData(nfoData, epNfoPath);
+
+                        var movieNfoPath = Path.Combine(folder, "movie.nfo");
+                        if (!File.Exists(movieNfoPath))
+                        {
+                            CreateFileService.CreateNfoFromData(nfoData, movieNfoPath);
+                        }
+
                         break;
                     }
                 }
