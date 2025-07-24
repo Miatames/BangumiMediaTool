@@ -19,19 +19,11 @@ public static class NfoDataService
     {
         if (files.Count == 0) return [];
 
-        string searchStr = files[0].FileName;
         List<DataEpisodesInfo> results = [];
 
         //快速搜索只按文件列表第一条进行搜索
         //解析标题
-        var aniParse = AnitomySharp.AnitomySharp.Parse(files[0].FileName);
-        foreach (var element in aniParse)
-        {
-            if (element.Category.ToString() == "ElementAnimeTitle" && !string.IsNullOrEmpty(element.Value))
-            {
-                searchStr = element.Value;
-            }
-        }
+        string searchStr = files[0].FileName.AniParseTitle();
 
         //文件识别到英文名称时用Bgm搜索可能无结果，使用Tmdb提高匹配准确率
         var (searchStrOrigin, tmdbId) = await BangumiApiService.Instance.TmdbApi_Search(searchStr);

@@ -78,6 +78,24 @@ public static class ExtensionTools
         return isEndsWith;
     }
 
+    /// <summary>
+    /// 解析文件对应剧集标题
+    /// </summary>
+    /// <param name="str">传入文件名</param>
+    /// <returns>剧集标题</returns>
+    public static string AniParseTitle(this string str)
+    {
+        var aniParse = AnitomySharp.AnitomySharp.Parse(str);
+        foreach (var element in aniParse)
+        {
+            if (element.Category.ToString() == "ElementAnimeTitle" && !string.IsNullOrEmpty(element.Value))
+            {
+                return element.Value;
+            }
+        }
+        return str;
+    }
+
     public static string RemoveInvalidFileNameChar(this string str)
     {
         var invalidFileNameChar = Path.GetInvalidFileNameChars();

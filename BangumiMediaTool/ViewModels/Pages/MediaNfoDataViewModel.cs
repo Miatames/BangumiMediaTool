@@ -88,6 +88,12 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
                 var (mediaFiles, subFiles) = files.GetDropFileList();
                 mediaFiles.ForEach(item => SourceFileList.AddUnique(item));
                 App.GetService<ReNameFileViewModel>()?.OnDropSubFiles(subFiles);
+                if (SourceFileList.Count > 0)
+                {
+                    var title = SourceFileList.First().FileName.AniParseTitle();
+                    App.GetService<SearchDataViewModel>()?.AddSearchText(title);
+                }
+
                 break;
             }
         }

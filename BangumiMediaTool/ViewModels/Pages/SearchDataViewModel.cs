@@ -37,6 +37,15 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
 
     public void OnNavigatedFrom() { }
 
+    /// <summary>
+    /// 添加文本到搜索框
+    /// </summary>
+    /// <param name="str"></param>
+    public void AddSearchText(string str)
+    {
+        SearchText = str;
+    }
+
     [RelayCommand]
     private async Task OnSearch()
     {
