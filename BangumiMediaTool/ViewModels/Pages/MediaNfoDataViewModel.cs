@@ -23,7 +23,6 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     [ObservableProperty] private int _currentSearchMode = 0;
     [ObservableProperty] private int _currentFileOperateMode = 0;
 
-    [ObservableProperty] private int _extraSettingsWidth = 0;
     [ObservableProperty] private bool _isExtraSettingsOn = false;
     [ObservableProperty] private string _specialText = string.Empty;
     [ObservableProperty] private int _seasonOffset = 0;
@@ -238,18 +237,5 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
         var list = SourceFileList.ToList()
             .OrderBy(path => path.FilePath, StringComparer.OrdinalIgnoreCase.WithNaturalSort());
         SourceFileList = new ObservableCollection<DataFilePath>(list);
-    }
-
-    [RelayCommand]
-    private void OnExtraSettingsShow()
-    {
-        if (IsExtraSettingsOn)
-        {
-            ExtraSettingsWidth = 160;
-        }
-        else
-        {
-            ExtraSettingsWidth = 0;
-        }
     }
 }
