@@ -86,6 +86,7 @@ public partial class App
 
         _ = new GlobalConfig();
         _ = new BangumiApiService();
+        _ = new TmdbApiService();
         _ = new QbtApiService();
     }
 

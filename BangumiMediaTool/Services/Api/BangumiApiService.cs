@@ -14,7 +14,7 @@ public class BangumiApiService
     private readonly string bgmApiUrlBase = @"https://api.bgm.tv";
 
     private readonly HttpClient bgmApiClient;
-    private readonly HttpClient tmdbApiClient;
+
 
     public BangumiApiService()
     {
@@ -30,74 +30,10 @@ public class BangumiApiService
         {
             bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
         }
-        bgmApiClient.Timeout = TimeSpan.FromSeconds(10);
 
-        tmdbApiClient = new HttpClient();
-        tmdbApiClient.DefaultRequestHeaders.Add("Accept", "application/json");
-        tmdbApiClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + TmdbInfo.Authorization);
         bgmApiClient.Timeout = TimeSpan.FromSeconds(10);
 
         Logs.LogInfo("BangumiApiService Initialize");
-    }
-
-    /// <summary>
-    /// TMDB API 搜索
-    /// </summary>
-    /// <param name="keywords">搜索关键词</param>
-    /// <returns>原文标题 TmdbID</returns>
-    public async Task<(string title, long? id)> TmdbApi_Search(string keywords)
-    {
-        if (string.IsNullOrEmpty(keywords) || string.IsNullOrEmpty(TmdbInfo.Authorization)) return (keywords, null);
-
-        var url = $"https://api.themoviedb.org/3/search/multi?query={Uri.EscapeDataString(keywords)}&include_adult=false&page=1";
-
-        HttpResponseMessage? response = null;
-        try
-        {
-            response = await tmdbApiClient.GetAsync(url);
-        }
-        catch (Exception e)
-        {
-            Logs.LogError($"{url} : Exception {e}");
-            return (keywords, null);
-        }
-
-        Logs.LogInfo($"请求: {url} : {response.StatusCode}");
-        if (!response.IsSuccessStatusCode) return (keywords, null);
-
-        TmdbApiJson_Search? jsonRoot;
-        try
-        {
-            jsonRoot = JsonSerializer.Deserialize<TmdbApiJson_Search>(await response.Content.ReadAsStringAsync());
-        }
-        catch (Exception e)
-        {
-            Logs.LogError(e.ToString());
-            return (keywords, null);
-        }
-
-        var resultTitle = keywords;
-        long? resultId = null;
-        if (jsonRoot is { results.Count: > 0 })
-        {
-            foreach (var resultsItem in jsonRoot.results)
-            {
-                if (resultsItem.media_type == "tv")
-                {
-                    resultTitle = resultsItem.original_name;
-                    resultId = resultsItem.id;
-                    break;
-                }
-                else if (resultsItem.media_type == "movie")
-                {
-                    resultTitle = resultsItem.original_title;
-                    resultId = resultsItem.id;
-                    break;
-                }
-            }
-        }
-
-        return (resultTitle, resultId);
     }
 
     /// <summary>
