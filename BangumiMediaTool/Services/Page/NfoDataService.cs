@@ -15,7 +15,8 @@ public static class NfoDataService
     /// 从文件名搜索元数据
     /// </summary>
     /// <param name="files">文件列表</param>
-    public static async Task<List<DataEpisodesInfo>> SearchDataByFilesAsync(List<DataFilePath> files)
+    /// <param name="isUseTmdb">是否使用Tmdb搜索</param>
+    public static async Task<List<DataEpisodesInfo>> SearchDataByFilesAsync(List<DataFilePath> files, bool isUseTmdb)
     {
         if (files.Count == 0) return [];
 
@@ -25,9 +26,10 @@ public static class NfoDataService
         //解析标题
         string searchStr = files[0].FileName.AniParseTitle();
 
-        //文件识别到英文名称时用Bgm搜索可能无结果，使用Tmdb提高匹配准确率
-        var (searchStrOrigin, tmdbId) = await TmdbApiService.Instance.TmdbApi_Search(searchStr);
-        var (dataSubjectsInfos, _) = await BangumiApiService.Instance.BangumiApi_Search(searchStrOrigin, 0);
+
+        //文件识别到英文名称时用Bgm搜索可能无结果，使用Tmdb提高匹配准确率，不使用Tmdb搜索则直接传空值
+        var (searchStrOrigin, tmdbId) = await TmdbApiService.Instance.TmdbApi_Search(isUseTmdb ? searchStr : string.Empty);
+        var (dataSubjectsInfos, _) = await BangumiApiService.Instance.BangumiApi_Search(isUseTmdb ? searchStrOrigin : searchStr, 0);
 
         if (dataSubjectsInfos.Count == 0)
         {

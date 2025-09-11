@@ -18,7 +18,7 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     [ObservableProperty] private ObservableCollection<DataEpisodesInfo> _nfoDataList = [];
 
     [ObservableProperty] private bool _isAddNfoFile = true;
-    [ObservableProperty] private bool _isAddTmdbId = true;
+    [ObservableProperty] private bool _isAddTmdbId = false;
     [ObservableProperty] private bool _isGetThumb = false;
     [ObservableProperty] private int _currentSearchMode = 0;
     [ObservableProperty] private int _currentFileOperateMode = 0;
@@ -115,7 +115,7 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
         var main = App.GetService<MainWindowViewModel>();
         main?.SetGlobalProcess(true);
 
-        var results = await NfoDataService.SearchDataByFilesAsync(SourceFileList.ToList());
+        var results = await NfoDataService.SearchDataByFilesAsync(SourceFileList.ToList(),IsAddTmdbId);
         results.ForEach(item => NfoDataList.Add(item));
 
         main?.SetGlobalProcess(false);
