@@ -27,11 +27,22 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
     [ObservableProperty] private string _subjectInfoUrl = string.Empty;
     [ObservableProperty] private string _subjectInfoDesc = string.Empty;
 
+    [ObservableProperty] private string _showPageText = string.Empty;
+    [ObservableProperty] private Visibility _isPages = Visibility.Collapsed;
+    private long _currentPageNum = 0;
+    private long _totalPageNum = 0;
+    private string _currentSearchText = string.Empty;
+
     public void OnNavigatedTo()
     {
         if (DataSearchResultList.Count == 0 || SearchListSelectItem is null)
         {
             IsEpisodes = Visibility.Hidden;
+            IsPages = Visibility.Collapsed;
+            ShowPageText = string.Empty;
+            _currentPageNum = 0;
+            _totalPageNum = 0;
+            _currentSearchText = string.Empty;
         }
     }
 
@@ -50,21 +61,32 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
     private async Task OnSearch()
     {
         IsEpisodes = Visibility.Hidden;
+        IsPages = Visibility.Collapsed;
         DataEpisodesInfoList.Clear();
+        DataSearchResultList.Clear();
         SearchListSelectItem = null;
+        ShowPageText = string.Empty;
+        _currentPageNum = 0;
+        _totalPageNum = 0;
+        _currentSearchText = string.Empty;
 
         var main = App.GetService<MainWindowViewModel>();
         main?.SetGlobalProcess(true);
 
-        var list = await BangumiApiService.Instance.BangumiApi_Search(SearchText, IsSearchAllResults);
+        var (list, total) = await BangumiApiService.Instance.BangumiApi_Search(SearchText, 0);
 
         main?.SetGlobalProcess(false);
 
         DataSearchResultList = new ObservableCollection<DataSubjectsInfo>(list);
-        if (DataSearchResultList.Count > 0)
+        if (list.Count > 0)
         {
             IsEpisodes = Visibility.Visible;
-            SearchListSelectItem = DataSearchResultList[0];
+            IsPages = Visibility.Visible;
+            SearchListSelectItem = list[0];
+            _currentSearchText = SearchText;
+            _currentPageNum = 1;
+            _totalPageNum = (long)Math.Ceiling(total / 20.0f);
+            SetPageText();
         }
         else
         {
@@ -72,13 +94,93 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
         }
     }
 
+    [RelayCommand]
+    private async Task OnPagePrevious()
+    {
+        if (_currentPageNum - 1 <= 0) return;
+
+        DataEpisodesInfoList.Clear();
+        DataSearchResultList.Clear();
+        _currentPageNum = _currentPageNum - 1;
+        SetPageText();
+
+        var main = App.GetService<MainWindowViewModel>();
+        main?.SetGlobalProcess(true);
+        var (list, _) = await BangumiApiService.Instance.BangumiApi_Search(SearchText, (_currentPageNum - 1) * 20);
+        main?.SetGlobalProcess(false);
+
+        DataSearchResultList = new ObservableCollection<DataSubjectsInfo>(list);
+        if (list.Count > 0)
+        {
+            SearchListSelectItem = list[0];
+            _currentSearchText = SearchText;
+        }
+        else
+        {
+            SearchListSelectItem = null;
+        }
+    }
+
+    [RelayCommand]
+    private async Task OnPageNext()
+    {
+        if (_currentPageNum + 1 > _totalPageNum) return;
+
+        DataEpisodesInfoList.Clear();
+        DataSearchResultList.Clear();
+
+        _currentPageNum = _currentPageNum + 1;
+        SetPageText();
+
+        var main = App.GetService<MainWindowViewModel>();
+        main?.SetGlobalProcess(true);
+        var (list, _) = await BangumiApiService.Instance.BangumiApi_Search(SearchText, (_currentPageNum - 1) * 20);
+        main?.SetGlobalProcess(false);
+
+        DataSearchResultList = new ObservableCollection<DataSubjectsInfo>(list);
+        if (list.Count > 0)
+        {
+            SearchListSelectItem = list[0];
+            _currentSearchText = SearchText;
+        }
+        else
+        {
+            SearchListSelectItem = null;
+        }
+    }
+
+    private void SetPageText()
+    {
+        if (_totalPageNum == 0)
+        {
+            ShowPageText = string.Empty;
+        }
+        else
+        {
+            ShowPageText = $"{_currentPageNum}/{_totalPageNum}";
+        }
+    }
+
+    partial void OnSearchTextChanged(string? oldValue, string newValue)
+    {
+        IsPages = newValue.Equals(_currentSearchText) ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     partial void OnSearchListSelectItemChanged(DataSubjectsInfo? value)
     {
         if (value != null)
         {
-            Logs.LogInfo(value.ShowText);
+            Logs.LogInfo($"{value.NameCn} ({value.Name})  id:{value.Id}  话数:{value.EpsCount}  放送时间：{value.AirDate}");
 
-            SubjectInfoName = $"{value.NameCn} ({value.Name})";
+            if (string.IsNullOrEmpty(value.Name))
+            {
+                SubjectInfoName = value.NameCn;
+            }
+            else
+            {
+                SubjectInfoName = $"{value.NameCn} ({value.Name})";
+            }
+
             SubjectInfoCount = value.EpsCount.ToString();
             SubjectInfoDate = value.AirDate;
             SubjectInfoDesc = value.Desc;

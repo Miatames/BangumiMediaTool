@@ -35,14 +35,17 @@ public class DataSubjectsInfo
     /// </summary>
     public string AirDate { get; init; } = string.Empty;
 
-    public string ShowText { get; private set; } = string.Empty;
+    /// <summary>
+    /// 分类
+    /// </summary>
+    public string Platform {get; init;} = string.Empty;
+
+    /// <summary>
+    /// 剧集封面图
+    /// </summary>
+    public string ImageUrl { get; init; } = string.Empty;
 
     private const double Tolerance = 1e-6;
-
-    public void BuildShowText()
-    {
-        ShowText = $"{NameCn} ({Name})  id:{Id}  话数:{EpsCount}  放送时间：{AirDate}";
-    }
 
     public override bool Equals(object? other)
     {
@@ -52,7 +55,9 @@ public class DataSubjectsInfo
                && NameCn == info.NameCn
                && EpsCount == info.EpsCount
                && Desc == info.Desc
-               && AirDate == info.AirDate;
+               && AirDate == info.AirDate
+               && Platform == info.Platform
+               && ImageUrl == info.ImageUrl;
     }
 
     public override int GetHashCode()
@@ -64,6 +69,8 @@ public class DataSubjectsInfo
         hashCode.Add(EpsCount);
         hashCode.Add(Desc);
         hashCode.Add(AirDate);
+        hashCode.Add(Platform);
+        hashCode.Add(ImageUrl);
         return hashCode.ToHashCode();
     }
 }

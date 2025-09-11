@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using BangumiMediaTool.Models;
 using BangumiMediaTool.Services.Program;
@@ -37,107 +38,95 @@ public class BangumiApiService
     }
 
     /// <summary>
-    /// Bangumi API 搜索
+    /// Bangumi API 搜索剧集
     /// </summary>
-    /// <param name="keywords">搜索关键词</param>
-    /// <param name="getAllResults">是否获取全部结果</param>
-    /// <returns>剧集数据列表</returns>
-    public async Task<List<DataSubjectsInfo>> BangumiApi_Search(string keywords, bool getAllResults = false)
+    /// <param name="keywords">搜素关键词</param>
+    /// <param name="offset">分页偏移参数 单页限制20</param>
+    /// <returns>数据列表 + 总条目数</returns>
+    public async Task<(List<DataSubjectsInfo>, long)> BangumiApi_Search(string keywords, long offset)
     {
-        var results = new List<string>();
-        if (string.IsNullOrEmpty(keywords)) return [];
+        if (string.IsNullOrEmpty(keywords)) return ([], 0);
 
-        var url = $"{bgmApiUrlBase}/search/subject/{Uri.EscapeDataString(keywords)}?type=2&responseGroup=large&start=0&max_results=25";
+        var url = $"{bgmApiUrlBase}/v0/search/subjects?limit=20&offset={offset}";
+
+        var data = new
+        {
+            keyword = keywords,
+            filter = new
+            {
+                type = new List<int> { 2 },
+                nsfw = true
+            }
+        };
+        var dataString = JsonSerializer.Serialize(data);
 
         HttpResponseMessage response;
         try
         {
             if (!string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization == null)
             {
-               bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
+                bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
             }
-            else if (string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization !=null)
+            else if (string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization != null)
             {
                 bgmApiClient.DefaultRequestHeaders.Authorization = null;
             }
 
-            response = await bgmApiClient.GetAsync(url);
+            response = await bgmApiClient.PostAsync(url, new StringContent(dataString, Encoding.UTF8));
         }
         catch (Exception e)
         {
             Logs.LogError($"{url} : Exception {e}");
-            return [];
+            return ([], 0);
         }
 
         Logs.LogInfo($"请求: {url} : {response.StatusCode}");
-        if (!response.IsSuccessStatusCode) return [];
+        if (!response.IsSuccessStatusCode) return ([], 0);
 
         var result = await response.Content.ReadAsStringAsync();
 
-        JsonDocument? document = null;
+        BgmApiJson_Search? jsonData;
         try
         {
-            document = JsonDocument.Parse(result);
+            jsonData = JsonSerializer.Deserialize<BgmApiJson_Search>(result);
         }
         catch (Exception e)
         {
             Logs.LogError(e.ToString());
-            return [];
+            return ([], 0);
         }
 
-        var root = document.RootElement;
-
-        //请求出错直接返回
-        if (root.TryGetProperty("error", out _)) return [];
-
-        results.Add(WebUtility.HtmlDecode(result));
-
-        if (getAllResults && root.TryGetProperty("results", out JsonElement maxCount) && maxCount.GetInt32() >= 25)
-        {
-            for (int i = 1; i < Math.Ceiling(maxCount.GetSingle() / 25.0f); i++)
-            {
-                var urlLoop = $"{bgmApiUrlBase}/search/subject/{Uri.EscapeDataString(keywords)}?type=2&responseGroup=large&start={i * 25}&max_results=25";
-                Console.WriteLine("请求: " + urlLoop);
-                var responseLoop = await bgmApiClient.GetAsync(urlLoop);
-                if (!responseLoop.IsSuccessStatusCode) continue;
-
-                var resultLoop = await responseLoop.Content.ReadAsStringAsync();
-                results.Add(WebUtility.HtmlDecode(resultLoop));
-            }
-        }
+        if (jsonData == null) return ([], 0);
 
         var dataSubjectsInfos = new List<DataSubjectsInfo>();
-        foreach (var r in results)
+        foreach (var item in jsonData.data)
         {
-            BgmApiJson_Search? jsonData;
-            try
+            if (string.IsNullOrEmpty(item.name) && !string.IsNullOrEmpty(item.name_cn))
             {
-                jsonData = JsonSerializer.Deserialize<BgmApiJson_Search>(r);
+                item.name = item.name_cn;
             }
-            catch (Exception e)
+            else if (!string.IsNullOrEmpty(item.name) && string.IsNullOrEmpty(item.name_cn))
             {
-                Logs.LogError(e.ToString());
-                continue;
+                item.name_cn = item.name;
+                item.name = string.Empty;
             }
 
-            if (jsonData == null) continue;
-            foreach (var item in jsonData.list)
+            var addData = new DataSubjectsInfo()
             {
-                var addData = new DataSubjectsInfo
-                {
-                    Id = item.id,
-                    Name = item.name,
-                    NameCn = item.name_cn,
-                    EpsCount = item.eps_count,
-                    Desc = item.summary,
-                    AirDate = item.air_date,
-                };
-                addData.BuildShowText();
-                dataSubjectsInfos.Add(addData);
-            }
+                Id = item.id,
+                Name = item.name,
+                NameCn = item.name_cn,
+                EpsCount = item.eps,
+                Desc = item.summary,
+                AirDate = item.date,
+                Platform = item.platform,
+                ImageUrl = item.images.small
+            };
+            // addData.BuildShowText();
+            dataSubjectsInfos.Add(addData);
         }
 
-        return dataSubjectsInfos;
+        return (dataSubjectsInfos, jsonData.total);
     }
 
     /// <summary>
@@ -157,7 +146,7 @@ public class BangumiApiService
             {
                 bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
             }
-            else if (string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization !=null)
+            else if (string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization != null)
             {
                 bgmApiClient.DefaultRequestHeaders.Authorization = null;
             }

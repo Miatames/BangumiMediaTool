@@ -27,7 +27,7 @@ public static class NfoDataService
 
         //文件识别到英文名称时用Bgm搜索可能无结果，使用Tmdb提高匹配准确率
         var (searchStrOrigin, tmdbId) = await TmdbApiService.Instance.TmdbApi_Search(searchStr);
-        var dataSubjectsInfos = await BangumiApiService.Instance.BangumiApi_Search(searchStrOrigin);
+        var (dataSubjectsInfos, _) = await BangumiApiService.Instance.BangumiApi_Search(searchStrOrigin, 0);
 
         if (dataSubjectsInfos.Count == 0)
         {
