@@ -1,10 +1,9 @@
 using System.Net.Http;
 using System.Text.Json;
+using BangumiMediaTool.Models;
 using BangumiMediaTool.Services.Program;
-using BangumiSubReNamer.Models;
-using NLog.Fluent;
 
-namespace BangumiSubReNamer.Services;
+namespace BangumiMediaTool.Services.Page;
 
 public class QbtApiService
 {

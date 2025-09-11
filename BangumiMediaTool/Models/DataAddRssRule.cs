@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace BangumiSubReNamer.Models;
+namespace BangumiMediaTool.Models;
 
 public class DataAddRssRule
 {

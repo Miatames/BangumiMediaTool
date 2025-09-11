@@ -2,8 +2,6 @@ using System.IO;
 using BangumiMediaTool.Models;
 using BangumiMediaTool.Services.Page;
 using BangumiMediaTool.Services.Program;
-using BangumiSubReNamer.Models;
-using BangumiSubReNamer.Services;
 using CommunityToolkit.Mvvm.Messaging;
 using Wpf.Ui.Controls;
 
