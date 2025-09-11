@@ -110,19 +110,19 @@
             </ComboBox>
             <ui:Button x:Name="UI_SearchButton"
                        Content="快速搜索"
-                       Width="120" Height="32" Margin="0,5"
+                       Width="120" Height="32" Margin="0,3"
                        Icon="{ui:SymbolIcon Search32}"
                        Command="{Binding ViewModel.QuickSearchCommand}"
                        Appearance="Light"
                        HorizontalAlignment="Right" />
             <ui:Button
                 Content="预览"
-                Width="120" Height="32" Margin="0,5"
+                Width="120" Height="32" Margin="0,3"
                 HorizontalAlignment="Right"
                 Icon="{ui:SymbolIcon Open32}"
                 Command="{Binding ViewModel.NavigateToPreviewWindowCommand}" />
             <ToggleButton Content="额外设置"
-                          Width="120" Height="32" Margin="0,5"
+                          Width="120" Height="32" Margin="0,3"
                           IsChecked="{Binding ViewModel.IsExtraSettingsOn}"
                           HorizontalAlignment="Right" />
         </StackPanel>
@@ -133,18 +133,18 @@
             <CheckBox x:Name="UI_IsAddNfoFile"
                       Content="生成元数据文件"
                       HorizontalAlignment="Right"
-                      Margin="0,5,8,5"
+                      Margin="0,0,8,2"
                       IsChecked="{Binding ViewModel.IsAddNfoFile,Mode=TwoWay}" />
             <CheckBox x:Name="UI_IsAddTmdb"
                       Content="添加 Tmdb ID"
                       HorizontalAlignment="Right"
                       IsEnabled="{Binding ViewModel.IsAddNfoFile}"
-                      Margin="0,5,8,5"
+                      Margin="0,0,8,2"
                       IsChecked="{Binding ViewModel.IsAddTmdbId,Mode=TwoWay}" />
             <CheckBox x:Name="UI_IsGetThumb"
                       Content="获取视频封面"
                       HorizontalAlignment="Right"
-                      Margin="0,5,8,5"
+                      Margin="0,0,8,2"
                       IsChecked="{Binding ViewModel.IsGetThumb,Mode=TwoWay}" />
             <!-- ToolTip="快速搜索匹配剧集时,在元数据中填入默认匹配的剧集的Tmdb ID" -->
             <ComboBox x:Name="UI_FileOperateMode"
