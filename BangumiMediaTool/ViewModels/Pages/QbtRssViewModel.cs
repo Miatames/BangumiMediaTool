@@ -123,6 +123,16 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
         if (dataSubjectsInfo != null) BangumiName = IsUseNameCn ? dataSubjectsInfo.NameCn : dataSubjectsInfo.Name;
     }
 
+    partial void OnRssFeedPathChanged(string value)
+    {
+        var title = RssPathService.AnalyzeRssPath(value);
+        if (!string.IsNullOrEmpty(title))
+        {
+            BangumiName = title;
+            App.GetService<SearchDataViewModel>()?.AddSearchText(title);
+        }
+    }
+
     public void OnNavigatedTo() { }
 
     public void OnNavigatedFrom() { }
