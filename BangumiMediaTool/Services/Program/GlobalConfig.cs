@@ -28,7 +28,7 @@ public class GlobalConfig
             AppConfig = JsonSerializer.Deserialize<AppConfig>(jsonString) ?? new AppConfig();
             if (AppConfig.DefaultPathMap.Count == 0)
             {
-                AppConfig.DefaultPathMap.Add("默认", "Media");
+                AppConfig.DefaultPathMap.Add("默认文件夹", "Media");
             }
 
             Logs.LogInfo(jsonString);
@@ -44,9 +44,9 @@ public class GlobalConfig
                 RegexRemoveSubtitleFiles = @"\[|\]|\(|\)|[\u4e00-\u9fa5]",
                 RegexMatchMediaFiles = ".mp4|.mkv|.flv",
                 DefaultAddSubtitleFilesExtensions = "|.chs|.cht",
-                DefaultPathMap = { { "默认", "Media" } },
+                DefaultPathMap = { { "默认文件夹", "Media" } },
                 CreateFolderNameTemplate = "{{SubjectNameCn}} ({{Year}})",
-                CreateBangumiFileNameTemplate = "{{SubjectNameCn}} - {{EpisodesSort}} - {{EpisodeNameCn}} - {{SourceFileName}}",
+                CreateBangumiFileNameTemplate = "{{SubjectNameCn}} - {{EpisodesSort}} - {{EpisodeNameCn}} - {{SourceFolderName}}",
                 CreateMovieFileNameTemplate = "{{SourceFileName}}",
                 QbtWebServerUrl = "http://127.0.0.1:8080/",
                 BangumiAuthToken = "",
