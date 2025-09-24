@@ -82,12 +82,12 @@ public partial class App
     /// </summary>
     private void OnStartup(object sender, StartupEventArgs e)
     {
-        _host.Start();
-
         _ = new GlobalConfig();
         _ = new BangumiApiService();
         _ = new TmdbApiService();
         _ = new QbtApiService();
+
+        _host.Start();
     }
 
     /// <summary>
