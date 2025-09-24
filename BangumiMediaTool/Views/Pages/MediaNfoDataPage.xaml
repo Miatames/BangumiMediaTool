@@ -159,6 +159,12 @@
                 <ComboBoxItem Content="重命名" />
                 <ComboBoxItem Content="仅生成元数据" />
             </ComboBox>
+            <ComboBox SelectedItem="{Binding ViewModel.CurrentTargetFolder}"
+                      ItemsSource="{Binding ViewModel.TargetFolderList}"
+                      IsEditable="False"
+                      Margin="0,5"
+                      MinWidth="140"
+                      HorizontalAlignment="Right"/>
             <ui:Button x:Name="UI_ClearButton"
                        Content="清除"
                        Width="120" Height="32" Margin="0,5"

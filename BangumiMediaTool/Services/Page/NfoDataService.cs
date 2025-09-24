@@ -67,11 +67,12 @@ public static class NfoDataService
     /// <param name="infoList">元数据列表</param>
     /// <param name="searchMode">搜索模式 0:剧集 1:电影</param>
     /// <param name="fileOperateMode">文件操作模式 0:硬链接 1:STRM 2:复制 3:重命名 4:仅生成元数据</param>
+    /// <param name="targetFolderConfig">配置文件中的文件夹路径</param>
     /// <param name="nfoExtraSettings">额外设置</param>
     /// <returns></returns>
     public static List<DataFilePath> CreateNewFileList(
         List<DataFilePath> sourceFileList, List<DataEpisodesInfo> infoList,
-        int searchMode, int fileOperateMode, NfoExtraSettings nfoExtraSettings)
+        int searchMode, int fileOperateMode, string targetFolderConfig, NfoExtraSettings nfoExtraSettings)
     {
         //集数补零
         var padLeft = Math.Min(sourceFileList.Count, infoList.Count).ToString().Length;
@@ -96,11 +97,43 @@ public static class NfoDataService
             }
 
             //重命名使用原文件夹，其他使用配置中的文件夹
-            var targetFolder = fileOperateMode switch
+            string? targetFolder;
+            var rootPathConfig = Path.GetPathRoot(targetFolderConfig);
+            switch (fileOperateMode)
             {
-                3 or 4 => Path.GetDirectoryName(sourcePath),
-                _ => Path.Combine(rootPath, GlobalConfig.Instance.AppConfig.DefaultHardLinkPath)
-            };
+                case 1 or 2:
+                {
+                    if (string.IsNullOrEmpty(rootPathConfig))
+                    {
+                        targetFolder = Path.Combine(rootPath, targetFolderConfig);
+                    }
+                    else
+                    {
+                        targetFolder = targetFolderConfig;
+                    }
+
+                    break;
+                }
+                case 3 or 4:
+                {
+                    targetFolder = Path.GetDirectoryName(sourcePath);
+                    break;
+                }
+                default:
+                {
+                    if (string.IsNullOrEmpty(rootPathConfig))
+                    {
+                        targetFolder = Path.Combine(rootPath, targetFolderConfig);
+                    }
+                    else
+                    {
+                        targetFolder = Path.Combine(rootPath, targetFolderConfig.Replace(rootPathConfig, string.Empty));
+                    }
+
+                    break;
+                }
+            }
+
             if (string.IsNullOrEmpty(targetFolder))
             {
                 Logs.LogError($"获取目标文件夹失败：{sourcePath}");
