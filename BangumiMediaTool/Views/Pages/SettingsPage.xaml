@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:BangumiMediaTool.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:models="clr-namespace:BangumiMediaTool.Models"
     Title="SettingsPage"
     d:DataContext="{d:DesignInstance local:SettingsPage,
                                      IsDesignTimeCreatable=False}"
@@ -27,8 +28,42 @@
             <ui:TextBox Text="{Binding ViewModel.AppConfig.RegexMatchMediaFiles}" />
             <Label Margin="0,10,0,0" Content="默认添加字幕文件扩展名:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.DefaultAddSubtitleFilesExtensions}" />
-            <Label Margin="0,10,0,0" Content="硬链接默认路径（相对文件所在盘的根目录）:" />
-            <ui:TextBox Text="{Binding ViewModel.AppConfig.DefaultHardLinkPath}" />
+            <Label Margin="0,10,0,0" Content="元数据和转换媒体默认路径:" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="60"/>
+                </Grid.ColumnDefinitions>
+                <ui:ListView Grid.Column="0" x:Name="UI_DefaultPathList"
+                             Margin="0,0,10,0"
+                             ItemsSource="{Binding ViewModel.TempPathMap}">
+                    <ui:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="8*" />
+                                    <ColumnDefinition Width="60" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBox Grid.Column="0" Margin="5,0" Text="{Binding Key}" />
+                                <ui:TextBox Grid.Column="1" Margin="5,0" Text="{Binding Value}" />
+                                <ui:Button Grid.Column="2" Margin="5,0"
+                                           Width="50" Height="35"
+                                           Icon="{ui:SymbolIcon Dismiss32}"
+                                           Command="{Binding DataContext.ViewModel.DeletePathItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:ListView}}}"
+                                           CommandParameter="{Binding}" />
+                                <!-- 获取Key参数并传递到DeletePathItem -->
+                            </Grid>
+                        </DataTemplate>
+                    </ui:ListView.ItemTemplate>
+                </ui:ListView>
+                <ui:Button Grid.Column="1" Margin="5,5"
+                           Width="50" Height="40"
+                           Appearance="Primary"
+                           VerticalAlignment="Top"
+                           Icon="{ui:SymbolIcon Add32}"
+                           Command="{Binding ViewModel.AddPathItemCommand}"/>
+            </Grid>
             <Label Margin="0,10,0,0" Content="文件夹名称模板:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.CreateFolderNameTemplate}" />
             <Label Margin="0,10,0,0" Content="剧集文件名模板:" />

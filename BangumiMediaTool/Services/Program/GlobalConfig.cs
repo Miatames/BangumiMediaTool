@@ -26,6 +26,11 @@ public class GlobalConfig
 
             var jsonString = File.ReadAllText("config.json");
             AppConfig = JsonSerializer.Deserialize<AppConfig>(jsonString) ?? new AppConfig();
+            if (AppConfig.DefaultPathMap.Count == 0)
+            {
+                AppConfig.DefaultPathMap.Add("默认", "Media");
+            }
+
             Logs.LogInfo(jsonString);
             GlobalFFOptions.Configure(new FFOptions() { BinaryFolder = AppConfig.FFmpegPath });
         }
@@ -39,7 +44,7 @@ public class GlobalConfig
                 RegexRemoveSubtitleFiles = @"\[|\]|\(|\)|[\u4e00-\u9fa5]",
                 RegexMatchMediaFiles = ".mp4|.mkv|.flv",
                 DefaultAddSubtitleFilesExtensions = "|.chs|.cht",
-                DefaultHardLinkPath = "Media",
+                DefaultPathMap = { { "默认", "Media" } },
                 CreateFolderNameTemplate = "{{SubjectNameCn}} ({{Year}})",
                 CreateBangumiFileNameTemplate = "{{SubjectNameCn}} - {{EpisodesSort}} - {{EpisodeNameCn}} - {{SourceFileName}}",
                 CreateMovieFileNameTemplate = "{{SourceFileName}}",
@@ -58,6 +63,11 @@ public class GlobalConfig
     public void WriteConfig(AppConfig setConfig)
     {
         AppConfig = setConfig;
+        if (AppConfig.DefaultPathMap.Count == 0)
+        {
+            AppConfig.DefaultPathMap.Add("默认", "Media");
+        }
+
         var jsonString = JsonSerializer.Serialize(AppConfig, defaultWriteOptions);
         File.WriteAllText("config.json", jsonString);
         GlobalFFOptions.Configure(new FFOptions() { BinaryFolder = AppConfig.FFmpegPath });

@@ -28,7 +28,15 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     [ObservableProperty] private int _seasonOffset = 0;
     [ObservableProperty] private int _episodeOffset = 0;
 
-    public void OnNavigatedTo() { }
+    [ObservableProperty] private ObservableCollection<string> _targetFolderList = [];
+    [ObservableProperty] private string _currentTargetFolder = string.Empty;
+
+    public void OnNavigatedTo()
+    {
+        TargetFolderList = new ObservableCollection<string>(GlobalConfig.Instance.AppConfig.DefaultPathMap.Keys);
+        if (TargetFolderList.Count > 0) CurrentTargetFolder = TargetFolderList[0];
+    }
+
     public void OnNavigatedFrom() { }
 
     private List<DataFilePath> sourceFileSelected = [];
@@ -115,7 +123,7 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
         var main = App.GetService<MainWindowViewModel>();
         main?.SetGlobalProcess(true);
 
-        var results = await NfoDataService.SearchDataByFilesAsync(SourceFileList.ToList(),IsAddTmdbId);
+        var results = await NfoDataService.SearchDataByFilesAsync(SourceFileList.ToList(), IsAddTmdbId);
         results.ForEach(item => NfoDataList.Add(item));
 
         main?.SetGlobalProcess(false);
@@ -124,7 +132,14 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     [RelayCommand]
     private void OnNavigateToPreviewWindow()
     {
-        var list = NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(), CurrentSearchMode, CurrentFileOperateMode,
+        if (string.IsNullOrEmpty(CurrentTargetFolder) ||
+            !GlobalConfig.Instance.AppConfig.DefaultPathMap.TryGetValue(CurrentTargetFolder, out var targetFolderConfig))
+        {
+            Logs.LogError("未找到目标文件夹的配置");
+            return;
+        }
+
+        var list = NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(), CurrentSearchMode, CurrentFileOperateMode, targetFolderConfig,
             new NfoExtraSettings() { SpecialText = SpecialText, SeasonOffset = SeasonOffset, EpisodeOffset = EpisodeOffset });
         var window = new FilePreviewWindow(new FilePreviewWindowViewModel(list))
         {
@@ -149,11 +164,19 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     private async Task OnRunFileOperate()
     {
         var main = App.GetService<MainWindowViewModel>();
+
+        if (string.IsNullOrEmpty(CurrentTargetFolder) ||
+            !GlobalConfig.Instance.AppConfig.DefaultPathMap.TryGetValue(CurrentTargetFolder, out var targetFolderConfig))
+        {
+            Logs.LogError("未找到目标文件夹的配置");
+            return;
+        }
+
         main?.SetGlobalProcess(true);
 
-        var newFileList =
-            NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(), CurrentSearchMode, CurrentFileOperateMode,
-                new NfoExtraSettings() { SpecialText = SpecialText, SeasonOffset = SeasonOffset, EpisodeOffset = EpisodeOffset });
+        var newFileList = NfoDataService.CreateNewFileList(SourceFileList.ToList(), NfoDataList.ToList(),
+            CurrentSearchMode, CurrentFileOperateMode, targetFolderConfig,
+            new NfoExtraSettings() { SpecialText = SpecialText, SeasonOffset = SeasonOffset, EpisodeOffset = EpisodeOffset });
         var record = await NfoDataService.RunFileOperates(SourceFileList.ToList(), newFileList, CurrentFileOperateMode);
         if (IsAddNfoFile)
         {
