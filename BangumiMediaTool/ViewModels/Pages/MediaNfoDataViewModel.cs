@@ -34,7 +34,7 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     public void OnNavigatedTo()
     {
         TargetFolderList = new ObservableCollection<string>(GlobalConfig.Instance.AppConfig.DefaultPathMap.Keys);
-        if (TargetFolderList.Count > 0) CurrentTargetFolder = TargetFolderList[0];
+        if (TargetFolderList.Count > 0 && string.IsNullOrEmpty(CurrentTargetFolder)) CurrentTargetFolder = TargetFolderList[0];
     }
 
     public void OnNavigatedFrom() { }
