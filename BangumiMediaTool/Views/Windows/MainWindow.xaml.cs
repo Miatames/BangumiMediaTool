@@ -81,7 +81,7 @@ public partial class MainWindow : INavigationWindow, IRecipient<DataSnackbarMess
         var element = FocusManager.GetFocusedElement(this);
 
         // 如果当前有焦点控件，且点击的区域不在该控件上，则清除焦点
-        if (element != null && !element.IsMouseOver)
+        if (element != null && !element.IsMouseOver && element is TextBox)
         {
             // 将焦点设置到窗口本身或其他透明控件
             FocusManager.SetFocusedElement(this, this);
