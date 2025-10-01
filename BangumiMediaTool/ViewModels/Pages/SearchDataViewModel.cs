@@ -33,6 +33,8 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
     private long _totalPageNum = 0;
     private string _currentSearchText = string.Empty;
 
+    private Dictionary<long, List<DataEpisodesInfo>> _tempDataList = new();
+
     public void OnNavigatedTo()
     {
         if (DataSearchResultList.Count == 0 || SearchListSelectItem is null)
@@ -168,6 +170,8 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
 
     partial void OnSearchListSelectItemChanged(DataSubjectsInfo? value)
     {
+        DataEpisodesInfoList.Clear();
+
         if (value != null)
         {
             Logs.LogInfo($"{value.NameCn} ({value.Name})  id:{value.Id}  话数:{value.EpsCount}  放送时间：{value.AirDate}");
@@ -185,6 +189,12 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
             SubjectInfoDate = value.AirDate;
             SubjectInfoDesc = value.Desc;
             SubjectInfoUrl = @"https://bgm.tv/subject/" + value.Id;
+
+
+            if (_tempDataList.TryGetValue(value.Id, out var list))
+            {
+                DataEpisodesInfoList = new ObservableCollection<DataEpisodesInfo>(list);
+            }
         }
         else
         {
@@ -194,8 +204,6 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
             SubjectInfoDesc = string.Empty;
             SubjectInfoUrl = string.Empty;
         }
-
-        DataEpisodesInfoList.Clear();
     }
 
     [RelayCommand]
@@ -208,6 +216,11 @@ public partial class SearchDataViewModel : ObservableObject, INavigationAware
         {
             var list = await BangumiApiService.Instance.BangumiApi_Episodes(SearchListSelectItem);
             DataEpisodesInfoList = new ObservableCollection<DataEpisodesInfo>(list);
+
+            if (!_tempDataList.TryAdd(SearchListSelectItem.Id, list))
+            {
+                _tempDataList[SearchListSelectItem.Id] = list;
+            }
         }
 
         main?.SetGlobalProcess(false);
