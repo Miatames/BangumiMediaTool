@@ -66,9 +66,9 @@ public class DataEpisodesInfo
     {
         ShowText = Type switch
         {
-            0 => $"{SubjectNameCn}  本篇:{Sort}  {NameCn} ({Name})  id:{Id}",
-            1 => $"{SubjectNameCn}  SP:{Sort}  {NameCn} ({Name})  id:{Id}",
-            _ => $"{SubjectNameCn}  其他:{Ep}-{Sort}  {NameCn} ({Name})  id:{Id}"
+            0 => $"{SubjectNameCn}  本篇:{Sort}  {NameCn} ({Name})",
+            1 => $"{SubjectNameCn}  SP:{Sort}  {NameCn} ({Name})",
+            _ => $"{SubjectNameCn}  其他:{Ep}-{Sort}  {NameCn} ({Name})"
         };
     }
 
