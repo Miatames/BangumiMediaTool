@@ -114,12 +114,12 @@ public class BangumiApiService
             var addData = new DataSubjectsInfo()
             {
                 Id = item.id,
-                Name = item.name,
-                NameCn = item.name_cn,
+                Name = WebUtility.HtmlDecode(item.name),
+                NameCn = WebUtility.HtmlDecode(item.name_cn),
                 EpsCount = item.eps,
-                Desc = item.summary,
+                Desc = WebUtility.HtmlDecode(item.summary),
                 AirDate = item.date,
-                Platform = item.platform,
+                Platform = WebUtility.HtmlDecode(item.platform),
                 ImageUrl = item.images.small
             };
             // addData.BuildShowText();
@@ -167,7 +167,7 @@ public class BangumiApiService
             if (!response.IsSuccessStatusCode) return sourceList;
 
             var result = await response.Content.ReadAsStringAsync();
-            jsonData = JsonSerializer.Deserialize<BgmApiJson_EpisodesInfo>(WebUtility.HtmlDecode(result));
+            jsonData = JsonSerializer.Deserialize<BgmApiJson_EpisodesInfo>(result);
             if (jsonData == null) return sourceList;
         }
         catch (Exception e)
@@ -181,8 +181,8 @@ public class BangumiApiService
             var addData = new DataEpisodesInfo
             {
                 Id = item.id,
-                Name = item.name,
-                NameCn = item.name_cn,
+                Name = WebUtility.HtmlDecode(item.name),
+                NameCn = WebUtility.HtmlDecode(item.name_cn),
                 SubjectName = subjectInfo.Name,
                 SubjectNameCn = subjectInfo.NameCn,
                 Ep = item.ep,
