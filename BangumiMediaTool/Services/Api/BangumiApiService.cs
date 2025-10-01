@@ -133,10 +133,21 @@ public class BangumiApiService
     /// Bangumi API 剧集所有章节
     /// </summary>
     /// <param name="subjectInfo">条目数据</param>
+    /// <param name="sourceList">初始数据列表</param>
     /// <returns></returns>
-    public async Task<List<DataEpisodesInfo>> BangumiApi_Episodes(DataSubjectsInfo subjectInfo)
+    public async Task<List<DataEpisodesInfo>> BangumiApi_Episodes(DataSubjectsInfo subjectInfo, List<DataEpisodesInfo>? sourceList = null)
     {
-        var url = $"{bgmApiUrlBase}/v0/episodes?subject_id={subjectInfo.Id}";
+        long offset = 0;
+        if (sourceList != null)
+        {
+            offset = sourceList.Count;
+        }
+        else
+        {
+            sourceList = [];
+        }
+
+        var url = $"{bgmApiUrlBase}/v0/episodes?subject_id={subjectInfo.Id}&limit=100&offset={offset}";
 
         BgmApiJson_EpisodesInfo? jsonData = null;
 
@@ -153,20 +164,19 @@ public class BangumiApiService
 
             var response = await bgmApiClient.GetAsync(url);
             Logs.LogInfo($"请求: {url} : {response.StatusCode}");
-            if (!response.IsSuccessStatusCode) return [];
+            if (!response.IsSuccessStatusCode) return sourceList;
 
             var result = await response.Content.ReadAsStringAsync();
             jsonData = JsonSerializer.Deserialize<BgmApiJson_EpisodesInfo>(WebUtility.HtmlDecode(result));
-            if (jsonData == null) return [];
+            if (jsonData == null) return sourceList;
         }
         catch (Exception e)
         {
             Logs.LogError(e.ToString());
-            return [];
+            return sourceList;
         }
 
-        var dataEpisodesInfos = new List<DataEpisodesInfo>();
-        foreach (var item in jsonData.data.Where(item => item.type is 0 or 1)) //只获取正篇和SP
+        foreach (var item in jsonData.data)
         {
             var addData = new DataEpisodesInfo
             {
@@ -182,9 +192,16 @@ public class BangumiApiService
                 Year = DateTime.Parse(subjectInfo.AirDate).Year.ToString()
             };
             addData.BuildShowText();
-            dataEpisodesInfos.Add(addData);
+            sourceList.Add(addData);
         }
 
-        return dataEpisodesInfos;
+        if (jsonData.offset + 100 >= jsonData.total)
+        {
+            return sourceList.Where(item=>item.Type is 0 or 1).ToList();  //只获取正篇和SP
+        }
+        else
+        {
+            return await BangumiApi_Episodes(subjectInfo, sourceList);
+        }
     }
 }
