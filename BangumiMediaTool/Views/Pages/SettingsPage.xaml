@@ -70,6 +70,10 @@
             <ui:TextBox Text="{Binding ViewModel.AppConfig.CreateBangumiFileNameTemplate}" />
             <Label Margin="0,10,0,0" Content="电影文件名模板:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.CreateMovieFileNameTemplate}" />
+            <Label Margin="0,10,0,0" Content="RSS下载文件夹模板:" />
+            <ui:TextBox Text="{Binding ViewModel.AppConfig.RssFolderNameTemplate}" />
+            <Label Margin="0,10,0,0" Content="RSS规则名模板:" />
+            <ui:TextBox Text="{Binding ViewModel.AppConfig.RssRuleNameTemplate}" />
             <Label Margin="0,10,0,0" Content="qBittorrent网页地址:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.QbtWebServerUrl}" />
             <Label Margin="0,10,0,0" Content="qBittorrent下载路径:" />

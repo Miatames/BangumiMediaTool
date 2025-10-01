@@ -55,6 +55,8 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
 
         GlobalConfig.Instance.WriteConfig(AppConfig);
         WeakReferenceMessenger.Default.Send(new DataSnackbarMessage("更新设置", string.Empty, ControlAppearance.Success));
+
+        App.GetService<QbtRssViewModel>()?.ReloadConfig();
     }
 
     [RelayCommand]

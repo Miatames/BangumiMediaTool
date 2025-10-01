@@ -17,18 +17,8 @@
     <Grid Margin="5">
         <StackPanel Orientation="Vertical"
                     Margin="20">
-            <Label Margin="0,10,0,0" Content="剧集名称:" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ui:TextBox Grid.Column="0" Text="{Binding ViewModel.BangumiName}" />
-                <CheckBox Grid.Column="1" Margin="10,0,0,0"
-                          Content="使用中文名称"
-                          IsChecked="{Binding ViewModel.IsUseNameCn,Mode=TwoWay}"
-                          Command="{Binding ViewModel.SetIsUseNameCnCommand}" />
-            </Grid>
+            <Label Margin="0,10,0,0" Content="剧集文件夹名称:" />
+            <ui:TextBox Grid.Column="0" Text="{Binding ViewModel.BangumiName}" />
 
             <Label Margin="0,10,0,0" Content="Bangumi Id:" />
             <ui:TextBox Text="{Binding ViewModel.BangumiId}" />
@@ -37,8 +27,7 @@
             <ui:TextBox Text="{Binding ViewModel.RssFeedPath}" />
 
             <Label Margin="0,10,0,0" Content="Rss规则名称:" />
-            <ui:TextBox Text="{Binding ViewModel.RssRuleName}"
-                        PlaceholderText="{Binding ViewModel.BangumiName}" />
+            <ui:TextBox Text="{Binding ViewModel.RssRuleName}"/>
 
             <CheckBox Content="启用正则"
                       Margin="0,10,0,0"
