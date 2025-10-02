@@ -82,7 +82,7 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
                             title = dataSubjectsInfo.NameCn,
                             originaltitle = dataSubjectsInfo.Name,
                             showtitle = dataSubjectsInfo.NameCn,
-                            year = DateTime.Parse(dataSubjectsInfo.AirDate).Year.ToString(),
+                            year = DateTime.TryParse(dataSubjectsInfo.AirDate, out var time) ? time.Year.ToString() : string.Empty,
                         };
                         CreateFileService.CreateNfoFromData(subjectsInfo, Path.Combine(folderPath, "tvshow.nfo"));
                     }
