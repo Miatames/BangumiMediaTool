@@ -80,10 +80,10 @@ public static partial class RssPathService
 
         var data = new
         {
-            SubjectId = info.Id,
-            SubjectName = info.Name,
-            SubjectNameCn = info.NameCn,
-            Year = airDate.Year,
+            SubjectId = templateType == 0 ? info.Id.ToString().RemoveInvalidPathNameChar() : info.Id.ToString(),
+            SubjectName = templateType == 0 ? info.Name.RemoveInvalidPathNameChar() : info.Name,
+            SubjectNameCn = templateType == 0 ? info.NameCn.RemoveInvalidPathNameChar() : info.NameCn,
+            Year = airDate.Year.ToString(),
             Month = airDate.Month.ToString().PadLeft(2, '0'),
             SeasonYear = seasonYear,
             SeasonMonth = seasonMonth,

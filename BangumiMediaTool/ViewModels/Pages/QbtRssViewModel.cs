@@ -34,7 +34,7 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
     {
         if (BangumiName.Length == 0 || RssFeedPath.Length == 0 || GlobalConfig.Instance.AppConfig.QbtDefaultDownloadPath.Length == 0) return;
 
-        var folderPath = Path.Combine(GlobalConfig.Instance.AppConfig.QbtDefaultDownloadPath, BangumiName.RemoveInvalidFileNameChar());
+        var folderPath = Path.Combine(GlobalConfig.Instance.AppConfig.QbtDefaultDownloadPath, BangumiName);
 
         var dataAddRssRule = new DataAddRssRule()
         {
@@ -50,7 +50,7 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
             LastMatch = "",
             AddPaused = false,
             AssignedCategory = "Bangumi",
-            SavePath = Path.Combine(folderPath, "Season 1").RemoveInvalidFileNameChar()
+            SavePath = Path.Combine(folderPath, "Season 1")
         };
 
         var addRuleName = RssRuleName.Length == 0 ? BangumiName : RssRuleName;
