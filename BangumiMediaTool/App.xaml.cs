@@ -109,5 +109,7 @@ public partial class App
         // WeakReferenceMessenger.Default.Send(new DataSnackbarMessage("错误", e.Exception.Message, ControlAppearance.Caution));
         Logs.LogError(e.Exception.Message);
         e.Handled = true;
+
+        GetService<MainWindowViewModel>()?.SetGlobalProcess(false);
     }
 }
