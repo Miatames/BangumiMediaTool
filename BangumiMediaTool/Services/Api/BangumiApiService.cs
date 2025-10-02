@@ -189,7 +189,7 @@ public class BangumiApiService
                 Sort = item.sort,
                 SubjectId = item.subject_id,
                 Type = item.type,
-                Year = DateTime.Parse(subjectInfo.AirDate).Year.ToString()
+                Year = DateTime.TryParse(subjectInfo.AirDate, out var time) ? time.Year.ToString() : string.Empty,
             };
             addData.BuildShowText();
             sourceList.Add(addData);
