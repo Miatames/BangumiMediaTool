@@ -43,6 +43,9 @@
                 <CheckBox Content="添加后启用下载规则"
                           Margin="0,0,30,0"
                           IsChecked="{Binding ViewModel.EnableRule,Mode=TwoWay}" />
+                <CheckBox Content="创建文件夹和元数据"
+                          Margin="0,0,30,0"
+                          IsChecked="{Binding ViewModel.AddNfoFile,Mode=TwoWay}" />
                 <ui:Button Content="添加订阅"
                            Width="120" Height="32"
                            Appearance="Primary"

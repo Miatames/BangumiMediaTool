@@ -17,6 +17,7 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
     [ObservableProperty] private string _mustNotContain = string.Empty;
     [ObservableProperty] private bool _isUseRegex = false;
     [ObservableProperty] private bool _enableRule = true;
+    [ObservableProperty] private bool _addNfoFile = true;
 
     private DataSubjectsInfo? dataSubjectsInfo = null;
 
@@ -67,7 +68,7 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
                         $"{addRuleName} [{RssFeedPath}]",
                         ControlAppearance.Success));
                 //全部添加成功后创建文件夹和元数据
-                if (EnableRule)
+                if (AddNfoFile)
                 {
                     if (!Directory.Exists(folderPath))
                     {
