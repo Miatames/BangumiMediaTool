@@ -197,7 +197,12 @@ public static class CreateFileService
 
                 try
                 {
-                    await FFMpeg.SnapshotAsync(sourceMediaFile, newThumbFile, size, TimeSpan.FromSeconds(cutTime));
+                    var (ffMpegArguments, outputOptions) = SnapshotArgumentBuilder.BuildSnapshotArguments(
+                        sourceMediaFile,
+                        await FFProbe.AnalyseAsync(sourceMediaFile).ConfigureAwait(false),
+                        size,
+                        TimeSpan.FromSeconds(cutTime), null, 0);
+                    await ffMpegArguments.OutputToFile(newThumbFile, addArguments: outputOptions).ProcessAsynchronously();
                     record.AppendLine(newThumbFile);
                 }
                 catch (Exception e)
