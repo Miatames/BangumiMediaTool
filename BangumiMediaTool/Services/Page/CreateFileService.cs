@@ -181,7 +181,7 @@ public static class CreateFileService
 
                 var newThumbFile = Path.Combine(
                     Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
-                    Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.png");
+                    Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.jpg");
 
 
                 var mediaInfo = await FFProbe.AnalyseAsync(sourceMediaFile);
@@ -226,13 +226,13 @@ public static class CreateFileService
 
                     var newThumbFile = Path.Combine(
                         Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
-                        Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.png");
+                        Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-thumb.jpg");
 
                     try
                     {
                         var shellFile = ShellFile.FromFilePath(sourceMediaFile);
                         var thumbData = shellFile.Thumbnail.ExtraLargeBitmap;
-                        thumbData?.Save(newThumbFile, ImageFormat.Png);
+                        thumbData?.Save(newThumbFile, ImageFormat.Jpeg);
                         record.AppendLine(newThumbFile);
                     }
                     catch (Exception e)
