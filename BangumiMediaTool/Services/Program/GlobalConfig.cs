@@ -16,6 +16,8 @@ public class GlobalConfig
         ReadConfig();
 
         Logs.LogInfo("GlobalConfig Initialize");
+
+        Logs.LogInfo(AppDomain.CurrentDomain.BaseDirectory);
     }
 
     public void ReadConfig()

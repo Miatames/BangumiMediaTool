@@ -1,6 +1,8 @@
-﻿using System.Drawing.Imaging;
+﻿using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
+using System.Windows.Media.Animation;
 using System.Xml;
 using System.Xml.Serialization;
 using BangumiMediaTool.Models;
@@ -249,5 +251,94 @@ public static class CreateFileService
         }
 
         return record.ToString();
+    }
+
+    /// <summary>
+    /// 生成进度预览图
+    /// </summary>
+    /// <param name="sourceFileList">源文件路径</param>
+    /// <param name="newFileList">目标文件路径</param>
+    public static async Task<string> RunCreateBifFiles(List<DataFilePath> sourceFileList, List<DataFilePath> newFileList)
+    {
+        var workDir = AppDomain.CurrentDomain.BaseDirectory;
+        var tempPath = Path.Combine(workDir, "temp");
+        if (Directory.Exists(tempPath))
+        {
+            var dirInfo = new DirectoryInfo(tempPath);
+            dirInfo.Empty();
+        }
+        else
+        {
+            Directory.CreateDirectory(tempPath);
+        }
+
+        var main = App.GetService<MainWindowViewModel>();
+        var count = Math.Min(sourceFileList.Count, newFileList.Count);
+        for (var i = 0; i < count; i++)
+        {
+            main?.SetGlobalProcess(true, i + 1, count, "生成进度预览图");
+            var sourceFile = sourceFileList[i].FilePath;
+            if (Path.GetExtension(sourceFileList[i].FileName) == ".strm") //对strm文件使用原位置
+            {
+                var p = await File.ReadAllTextAsync(sourceFile);
+                if (File.Exists(p))
+                {
+                    sourceFile = p;
+                }
+            }
+
+            var newBifFile = Path.Combine(
+                Path.GetDirectoryName(newFileList[i].FilePath) ?? string.Empty,
+                Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-320-10.bif");
+
+            //缩略图截图
+            try
+            {
+                await FFMpegArguments
+                    .FromFileInput(sourceFile)
+                    .OutputToFile($"{tempPath}\\%08d.jpg", true, options => options
+                        .WithCustomArgument("""
+                                            -vf "fps=1/10,scale=320:-1"
+                                            """)
+                    )
+                    .ProcessAsynchronously();
+            }
+            catch (Exception e)
+            {
+                Logs.LogError(e.ToString());
+                break;
+            }
+
+            await Task.Run(() =>
+            {
+                //转换截图为bif，保存到当前工作目录
+                Logs.LogInfo(workDir);
+                var bifToolProcess = new ProcessStartInfo
+                {
+                    FileName = "biftool.exe",
+                    Arguments = "-t 10000 temp",
+                    WorkingDirectory = workDir,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using var process = Process.Start(bifToolProcess);
+                process?.WaitForExit();
+            });
+
+            //移动文件
+            var bifTempPath = Path.Combine(workDir, "temp.bif");
+            if (File.Exists(bifTempPath))
+            {
+                File.Move(bifTempPath, newBifFile);
+                Logs.LogInfo($"移动：[{bifTempPath}]-[{newBifFile}]");
+            }
+
+            //清理临时目录
+            var dirInfo = new DirectoryInfo(tempPath);
+            dirInfo.Empty();
+        }
+
+        return "";
     }
 }

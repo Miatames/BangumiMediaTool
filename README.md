@@ -4,12 +4,12 @@
 使用[BangumiApi](https://github.com/bangumi/api)和[TMDBApi](https://developer.themoviedb.org/docs/getting-started)获取视频信息并生成nfo文件  
 批量重命名字幕文件  
 ass字幕转srt（需要配置ffmpeg路径）（详见Wiki说明）  
-获取视频文件缩略图  
+获取视频文件缩略图和进度条预览图  
 
 ### 测试环境：
 Win11  
 .net8.0  
-JetBrains Rider 2025.2  
+JetBrains Rider 2025.3  
 
 ### 相关：
 本项目基于[WPF-UI](https://github.com/lepoco/wpfui)项目模板开发  

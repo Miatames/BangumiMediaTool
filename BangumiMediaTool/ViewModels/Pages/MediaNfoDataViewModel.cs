@@ -20,6 +20,7 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
     [ObservableProperty] private bool _isAddNfoFile = true;
     [ObservableProperty] private bool _isAddTmdbId = false;
     [ObservableProperty] private bool _isGetThumb = false;
+    [ObservableProperty] private bool _isCreateBif = false;
     [ObservableProperty] private int _currentSearchMode = 0;
     [ObservableProperty] private int _currentFileOperateMode = 0;
 
@@ -193,6 +194,18 @@ public partial class MediaNfoDataViewModel : ObservableObject, INavigationAware,
             else
             {
                 await CreateFileService.RunCreateThumbFiles(SourceFileList.ToList(), newFileList);
+            }
+        }
+
+        if (IsCreateBif)
+        {
+            if (CurrentFileOperateMode == 4 && !IsAddNfoFile)
+            {
+                record = await CreateFileService.RunCreateBifFiles(SourceFileList.ToList(), SourceFileList.ToList());
+            }
+            else
+            {
+                await CreateFileService.RunCreateBifFiles(SourceFileList.ToList(), newFileList);
             }
         }
 

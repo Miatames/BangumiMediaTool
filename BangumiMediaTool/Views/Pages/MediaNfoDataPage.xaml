@@ -146,6 +146,11 @@
                       HorizontalAlignment="Right"
                       Margin="0,0,8,2"
                       IsChecked="{Binding ViewModel.IsGetThumb,Mode=TwoWay}" />
+            <CheckBox x:Name="UI_IsCreateBif"
+                      Content="获取进度预览图"
+                      HorizontalAlignment="Right"
+                      Margin="0,0,8,2"
+                      IsChecked="{Binding ViewModel.IsCreateBif,Mode=TwoWay}" />
             <!-- ToolTip="快速搜索匹配剧集时,在元数据中填入默认匹配的剧集的Tmdb ID" -->
             <ComboBox x:Name="UI_FileOperateMode"
                       SelectedIndex="{Binding ViewModel.CurrentFileOperateMode,Mode=TwoWay}"

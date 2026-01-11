@@ -93,6 +93,7 @@ public static class ExtensionTools
                 return element.Value;
             }
         }
+
         return str;
     }
 
@@ -110,4 +111,10 @@ public static class ExtensionTools
 
     [DllImport("Kernel32", CharSet = CharSet.Unicode)]
     public static extern bool CreateHardLink(string linkName, string sourceName, IntPtr attribute);
+
+    public static void Empty(this DirectoryInfo directory)
+    {
+        foreach (FileInfo file in directory.GetFiles()) file.Delete();
+        foreach (DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
+    }
 }
