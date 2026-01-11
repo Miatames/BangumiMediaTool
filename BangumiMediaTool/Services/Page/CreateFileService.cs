@@ -292,23 +292,24 @@ public static class CreateFileService
                 Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-320-10.bif");
 
             //缩略图截图
-            await FFMpegArguments
-                .FromFileInput(sourceFile)
-                .OutputToFile($"{tempPath}\\%08d.jpg", true, options => options
-                    .WithCustomArgument("""
-                                        -vf "fps=1/10,scale=320:-1"
-                                        """)
-                )
-                .ProcessAsynchronously();
-
-            //前移文件名序号
-            var tempDirInfo = new DirectoryInfo(tempPath);
-            var tempName = Path.Combine(tempPath, "00000000.jpg");
-            foreach (var fileInfo in tempDirInfo.GetFiles())
+            var duration = (await FFProbe.AnalyseAsync(sourceFile)).Duration.TotalSeconds;
+            await Task.Run(() =>
             {
-                File.Move(fileInfo.FullName, tempName);
-                tempName = fileInfo.FullName;
-            }
+                Parallel.For(0, (int)Math.Floor(duration / 10), pCount =>
+                {
+                    var time = TimeSpan.FromSeconds(pCount * 10);
+                    var fileInfo = new FileInfo(sourceFile);
+                    FFMpegArguments
+                        .FromFileInput(fileInfo, option => option
+                            .Seek(time)
+                        )
+                        .OutputToFile(Path.Combine(tempPath, $"{pCount:D8}.jpg"), true, options => options
+                            .WithFrameOutputCount(1)
+                            .WithVideoFilters(filterOptions => filterOptions.Scale(320, -1))
+                            .WithCustomArgument("-an -q:v 2 -preset ultrafast")
+                        ).ProcessSynchronously();
+                });
+            });
 
             await Task.Run(() =>
             {
