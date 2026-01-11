@@ -57,8 +57,7 @@
         <Grid Background="#44d3d3d3"
               Visibility="{Binding ViewModel.IsProcess,Mode=TwoWay}"
               d:IsHidden="True">
-            <ui:ProgressRing IsIndeterminate="{Binding ViewModel.IsIndeterminate}"
-                             Progress="{Binding ViewModel.ProcessValue}" />
+            <ui:ProgressRing IsIndeterminate="True" />
             <TextBlock Text="{Binding ViewModel.ProcessText}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
