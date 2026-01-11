@@ -50,9 +50,20 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty] private ObservableCollection<MenuItem> _trayMenuItems = new() { };
 
-    public void SetGlobalProcess(bool isShow, int currentValue = 0, int totalValue = 0)
+    public void SetGlobalProcess(bool isShow, int currentValue = 0, int totalValue = 0, string text = "")
     {
         IsProcess = isShow ? Visibility.Visible : Visibility.Hidden;
-        ProcessText = totalValue == 0 ? string.Empty : $"{currentValue} / {totalValue}";
+        if (totalValue == 0 && text == string.Empty)
+        {
+            ProcessText = string.Empty;
+        }
+        else if (totalValue != 0 && text == string.Empty)
+        {
+            ProcessText = $"{currentValue} / {totalValue}";
+        }
+        else
+        {
+            ProcessText = $"{text}：{currentValue} / {totalValue}";
+        }
     }
 }

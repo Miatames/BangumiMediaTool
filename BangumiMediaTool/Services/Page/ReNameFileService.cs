@@ -125,7 +125,7 @@ public static partial class ReNameFileService
 
             for (int i = 0; i < count; i++)
             {
-                main?.SetGlobalProcess(true, i + 1, count);
+                main?.SetGlobalProcess(true, i + 1, count, "转换为srt");
 
                 await ConvertAssFileToSrt(subtitleFiles[i].FilePath, targetPaths[i].FilePath);
                 recordStr.AppendLine(targetPaths[i].FilePath);
@@ -159,16 +159,16 @@ public static partial class ReNameFileService
         {
             for (int i = 0; i < count; i++)
             {
-                main?.SetGlobalProcess(true, i + 1, count);
-
                 switch (fileOperateMode)
                 {
                     case 0:
+                        main?.SetGlobalProcess(true, i + 1, count, "复制");
                         File.Copy(subtitleFiles[i].FilePath, targetPaths[i].FilePath, true);
                         recordStr.AppendLine(targetPaths[i].FilePath);
                         Logs.LogInfo($"复制：{subtitleFiles[i].FilePath} >> {targetPaths[i].FilePath}");
                         break;
                     case 1:
+                        main?.SetGlobalProcess(true, i + 1, count, "重命名");
                         File.Move(subtitleFiles[i].FilePath, targetPaths[i].FilePath, true);
                         recordStr.AppendLine(targetPaths[i].FilePath);
                         Logs.LogInfo($"重命名：{subtitleFiles[i].FilePath} >> {targetPaths[i].FilePath}");

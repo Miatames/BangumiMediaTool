@@ -227,30 +227,34 @@ public static class NfoDataService
 
                 try
                 {
-                    main?.SetGlobalProcess(true, i + 1, count);
                     switch (fileOperateMode)
                     {
                         case 0: //硬链接
+                            main?.SetGlobalProcess(true, i + 1, count, "硬链接");
                             ExtensionTools.CreateHardLink(newFileList[i].FilePath, sourceFileList[i].FilePath, IntPtr.Zero);
                             Logs.LogInfo($"硬链接：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
                         case 1: //STRM
+                            main?.SetGlobalProcess(true, i + 1, count, "生成STRM");
                             File.WriteAllText(newFileList[i].FilePath, sourceFileList[i].FilePath);
                             Logs.LogInfo($"生成STRM：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
                         case 2: //复制
+                            main?.SetGlobalProcess(true, i + 1, count, "复制");
                             File.Copy(sourceFileList[i].FilePath, newFileList[i].FilePath, true);
                             Logs.LogInfo($"复制：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
                         case 3: //重命名
+                            main?.SetGlobalProcess(true, i + 1, count, "重命名");
                             File.Move(sourceFileList[i].FilePath, newFileList[i].FilePath, true);
                             Logs.LogInfo($"重命名：{newFileList[i].FilePath}");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
                         case 4: //仅生成元数据
+                            main?.SetGlobalProcess(true, i + 1, count, "生成元数据");
                             record.AppendLine(newFileList[i].FilePath);
                             break;
                     }
