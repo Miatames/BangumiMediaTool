@@ -167,7 +167,7 @@ public static class CreateFileService
             Logs.LogInfo("ffmpeg.exe process is already running");
             for (int i = 0; i < count; i++)
             {
-                main?.SetGlobalProcess(true, i + 1, count);
+                main?.SetGlobalProcess(true, i + 1, count, "生成视频预览图");
 
                 var sourceMediaFile = sourceFileList[i].FilePath;
                 if (Path.GetExtension(sourceFileList[i].FileName) == ".strm") //对strm文件使用原位置
@@ -217,7 +217,7 @@ public static class CreateFileService
             {
                 for (int i = 0; i < count; i++)
                 {
-                    main?.SetGlobalProcess(true, i + 1, count);
+                    main?.SetGlobalProcess(true, i + 1, count, "生成视频预览图");
 
                     var sourceMediaFile = sourceFileList[i].FilePath;
                     if (Path.GetExtension(sourceFileList[i].FileName) == ".strm") //对strm文件使用原位置
