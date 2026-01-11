@@ -292,21 +292,22 @@ public static class CreateFileService
                 Path.GetFileNameWithoutExtension(newFileList[i].FileName) + "-320-10.bif");
 
             //缩略图截图
-            try
+            await FFMpegArguments
+                .FromFileInput(sourceFile)
+                .OutputToFile($"{tempPath}\\%08d.jpg", true, options => options
+                    .WithCustomArgument("""
+                                        -vf "fps=1/10,scale=320:-1"
+                                        """)
+                )
+                .ProcessAsynchronously();
+
+            //前移文件名序号
+            var tempDirInfo = new DirectoryInfo(tempPath);
+            var tempName = Path.Combine(tempPath, "00000000.jpg");
+            foreach (var fileInfo in tempDirInfo.GetFiles())
             {
-                await FFMpegArguments
-                    .FromFileInput(sourceFile)
-                    .OutputToFile($"{tempPath}\\%08d.jpg", true, options => options
-                        .WithCustomArgument("""
-                                            -vf "fps=1/10,scale=320:-1"
-                                            """)
-                    )
-                    .ProcessAsynchronously();
-            }
-            catch (Exception e)
-            {
-                Logs.LogError(e.ToString());
-                break;
+                File.Move(fileInfo.FullName, tempName);
+                tempName = fileInfo.FullName;
             }
 
             await Task.Run(() =>
