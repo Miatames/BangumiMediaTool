@@ -10,6 +10,9 @@ public class AppConfig : ObservableObject
     //排除字幕文件扩展名
     public string RegexRemoveSubtitleFiles { get; set; } = @"\[|\]|\(|\)|[\u4e00-\u9fa5]";
 
+    //排除子文件夹
+    public string RegexIgnoreFolderName { get; set; } = @"特典|Scan|CD|SPs|Preview|Extra|Bonus";
+
     //匹配媒体文件扩展名
     public string RegexMatchMediaFiles { get; set; } = ".mp4|.mkv|.flv|.strm";
 

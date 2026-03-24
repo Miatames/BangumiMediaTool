@@ -24,6 +24,8 @@
             <ui:TextBox Text="{Binding ViewModel.AppConfig.RegexMatchSubtitleFiles}" />
             <Label Margin="0,10,0,0" Content="排除字幕文件扩展名:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.RegexRemoveSubtitleFiles}" />
+            <Label Margin="0,10,0,0" Content="排除子文件夹:" />
+            <ui:TextBox Text="{Binding ViewModel.AppConfig.RegexIgnoreFolderName}" />
             <Label Margin="0,10,0,0" Content="匹配媒体文件扩展名:" />
             <ui:TextBox Text="{Binding ViewModel.AppConfig.RegexMatchMediaFiles}" />
             <Label Margin="0,10,0,0" Content="默认添加字幕文件扩展名:" />

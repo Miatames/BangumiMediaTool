@@ -20,6 +20,11 @@ public static class DragDropService
     /// <returns></returns>
     public static (List<DataFilePath> mediaFileList, List<DataFilePath> subFileList) GetDropFileList(this StringCollection fileList)
     {
+        var config = GlobalConfig.Instance.AppConfig;
+        var regexMedia = config.RegexMatchMediaFiles;
+        var regexSub = config.RegexMatchSubtitleFiles;
+        var regexIgnoreFolder = config.RegexIgnoreFolderName;
+
         var filePathList = new List<string>();
         foreach (var file in fileList)
         {
@@ -30,7 +35,13 @@ public static class DragDropService
             else if (Directory.Exists(file))
             {
                 filePathList.AddRange(Directory.GetFiles(file));
-                filePathList.AddRange(Directory.GetDirectories(file).SelectMany(Directory.GetFiles));
+                foreach (var directory in Directory.GetDirectories(file))
+                {
+                    if (!Regex.IsMatch(directory, regexIgnoreFolder))
+                    {
+                        filePathList.AddRange(Directory.GetFiles(directory));
+                    }
+                }
             }
             else
             {
@@ -39,10 +50,6 @@ public static class DragDropService
         }
 
         filePathList.Sort(StringComparer.OrdinalIgnoreCase.WithNaturalSort());
-
-        var config = GlobalConfig.Instance.AppConfig;
-        var regexMedia = config.RegexMatchMediaFiles;
-        var regexSub = config.RegexMatchSubtitleFiles;
 
         if (string.IsNullOrEmpty(regexMedia) || string.IsNullOrEmpty(regexSub))
         {
