@@ -80,9 +80,9 @@ public static partial class RssPathService
 
         var data = new
         {
-            SubjectId = templateType == 0 ? info.Id.ToString().RemoveInvalidPathNameChar() : info.Id.ToString(),
-            SubjectName = templateType == 0 ? info.Name.RemoveInvalidPathNameChar() : info.Name,
-            SubjectNameCn = templateType == 0 ? info.NameCn.RemoveInvalidPathNameChar() : info.NameCn,
+            SubjectId = info.Id.ToString(),
+            SubjectName = info.Name,
+            SubjectNameCn = info.NameCn,
             Year = airDate.Year.ToString(),
             Month = airDate.Month.ToString().PadLeft(2, '0'),
             SeasonYear = seasonYear,
@@ -94,7 +94,7 @@ public static partial class RssPathService
         if (parser.TryParse(template, out var fluidTemplate))
         {
             var context = new TemplateContext(data);
-            name = fluidTemplate.Render(context);
+            name = templateType == 0 ? fluidTemplate.Render(context).RemoveInvalidFileNameChar().RemoveInvalidPathNameChar() : fluidTemplate.Render(context);
         }
 
         return name;
