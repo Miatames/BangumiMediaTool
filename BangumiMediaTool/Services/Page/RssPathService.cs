@@ -8,24 +8,28 @@ namespace BangumiMediaTool.Services.Program;
 
 public static partial class RssPathService
 {
-    public static string AnalyzeRssPath(string url)
+    public static (string, long) AnalyzeRssPath(string url)
     {
         var paramDict = GetUrlParams(url);
 
         if (url.Contains("nyaa.si/?page=rss") && paramDict.TryGetValue("q", out var nyaa_value))
         {
-            return HttpUtility.UrlDecode(nyaa_value, Encoding.UTF8);
+            return (HttpUtility.UrlDecode(nyaa_value, Encoding.UTF8), 0);
         }
         else if (url.Contains("share.dmhy.org/topics/rss/rss.xml") && paramDict.TryGetValue("keyword", out var dmhy_value))
         {
-            return HttpUtility.UrlDecode(dmhy_value, Encoding.UTF8);
+            return (HttpUtility.UrlDecode(dmhy_value, Encoding.UTF8), 0);
         }
         else if (url.Contains("ouo.si/feed") && paramDict.TryGetValue("q", out var ouo_value))
         {
-            return HttpUtility.UrlDecode(ouo_value, Encoding.UTF8);
+            return (HttpUtility.UrlDecode(ouo_value, Encoding.UTF8), 0);
+        }
+        else if (url.Contains("anibt.net/rss") && paramDict.TryGetValue("bgmId", out var anibt_value) && long.TryParse(anibt_value, out var bgmId))
+        {
+            return (string.Empty, bgmId);
         }
 
-        return string.Empty;
+        return (string.Empty, 0);
     }
 
     private static Dictionary<string, string> GetUrlParams(string url)
@@ -94,7 +98,9 @@ public static partial class RssPathService
         if (parser.TryParse(template, out var fluidTemplate))
         {
             var context = new TemplateContext(data);
-            name = templateType == 0 ? fluidTemplate.Render(context).RemoveInvalidFileNameChar().RemoveInvalidPathNameChar() : fluidTemplate.Render(context);
+            name = templateType == 0
+                ? fluidTemplate.Render(context).RemoveInvalidFileNameChar().RemoveInvalidPathNameChar()
+                : fluidTemplate.Render(context);
         }
 
         return name;

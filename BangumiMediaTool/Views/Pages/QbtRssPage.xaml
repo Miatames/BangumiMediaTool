@@ -21,7 +21,20 @@
             <ui:TextBox Grid.Column="0" Text="{Binding ViewModel.BangumiName}" />
 
             <Label Margin="0,10,0,0" Content="Bangumi Id:" />
-            <ui:TextBox Text="{Binding ViewModel.BangumiId}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+                <ui:TextBox Grid.Column="0" 
+                            Margin="0,0,10,0" 
+                            Text="{Binding ViewModel.BangumiId}" />
+                <ui:Button Grid.Column="1" Content="搜索"
+                           Icon="{ui:SymbolIcon Search32}"
+                           Width="120" Height="32"
+                           Appearance="Primary"
+                           Command="{Binding ViewModel.SearchBangumiIdCommand}"/>
+            </Grid>
 
             <Label Margin="0,10,0,0" Content="Rss订阅地址:" />
             <ui:TextBox Text="{Binding ViewModel.RssFeedPath}" />

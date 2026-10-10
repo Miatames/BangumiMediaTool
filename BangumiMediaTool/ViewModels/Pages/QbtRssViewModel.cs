@@ -1,7 +1,9 @@
 using System.IO;
 using BangumiMediaTool.Models;
+using BangumiMediaTool.Services.Api;
 using BangumiMediaTool.Services.Page;
 using BangumiMediaTool.Services.Program;
+using BangumiMediaTool.ViewModels.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Wpf.Ui.Controls;
 
@@ -25,9 +27,41 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
     {
         dataSubjectsInfo = message;
 
-        BangumiName = RssPathService.GetRssFolderName(dataSubjectsInfo,0);
+        BangumiName = RssPathService.GetRssFolderName(dataSubjectsInfo, 0);
         BangumiId = dataSubjectsInfo.Id.ToString();
-        RssRuleName = RssPathService.GetRssFolderName(dataSubjectsInfo,1);
+        RssRuleName = RssPathService.GetRssFolderName(dataSubjectsInfo, 1);
+    }
+
+    [RelayCommand]
+    private async Task OnSearchBangumiId()
+    {
+        if (BangumiId.Length == 0) return;
+
+        if (long.TryParse(BangumiId, out var id))
+        {
+            var main = App.GetService<MainWindowViewModel>();
+            
+            main?.SetGlobalProcess(true);
+            var subjectDetails = await BangumiApiService.Instance.BangumiApi_SubjectDetail(id);
+            main?.SetGlobalProcess(false);
+            
+            if (subjectDetails != null)
+            {
+                var dataSubjectsInfo = new DataSubjectsInfo
+                {
+                    Id = subjectDetails.id,
+                    Name = subjectDetails.name,
+                    NameCn = subjectDetails.name_cn,
+                    EpsCount = subjectDetails.eps,
+                    Desc = subjectDetails.summary,
+                    AirDate = subjectDetails.date,
+                    Platform = subjectDetails.platform,
+                    ImageUrl = subjectDetails.images.small
+                };
+                
+                AddRssData(dataSubjectsInfo);
+            }
+        }
     }
 
     [RelayCommand]
@@ -120,21 +154,30 @@ public partial class QbtRssViewModel : ObservableRecipient, INavigationAware
 
     partial void OnRssFeedPathChanged(string value)
     {
-        var title = RssPathService.AnalyzeRssPath(value);
-        if (!string.IsNullOrEmpty(title) && string.IsNullOrEmpty(BangumiName))
+        var (title, id) = RssPathService.AnalyzeRssPath(value);
+        
+        if (!string.IsNullOrEmpty(title) && id == 0)
         {
             BangumiName = title;
             App.GetService<SearchDataViewModel>()?.AddSearchText(title);
         }
+        else if (string.IsNullOrEmpty(title) && id != 0)
+        {
+            BangumiId = id.ToString();
+        }
     }
 
-    public void OnNavigatedTo() { }
+    public void OnNavigatedTo()
+    {
+    }
 
-    public void OnNavigatedFrom() { }
+    public void OnNavigatedFrom()
+    {
+    }
 
     public void ReloadConfig()
     {
-        if (dataSubjectsInfo!=null)
+        if (dataSubjectsInfo != null)
         {
             AddRssData(dataSubjectsInfo);
         }

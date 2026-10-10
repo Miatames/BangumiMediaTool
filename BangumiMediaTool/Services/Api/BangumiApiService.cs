@@ -204,4 +204,42 @@ public class BangumiApiService
             return await BangumiApi_Episodes(subjectInfo, sourceList);
         }
     }
+    
+    /// <summary>
+    /// Bangumi API 通过ID获得条目数据
+    /// </summary>
+    /// <param name="subjectId">条目ID</param>
+    /// <returns></returns>
+    public async Task<BgmApiJson_SearchListItem?> BangumiApi_SubjectDetail(long subjectId)
+    {
+        var url = $"{bgmApiUrlBase}/v0/subjects/{subjectId}";
+
+        BgmApiJson_SearchListItem? jsonData = null;
+
+        try
+        {
+            if (!string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization == null)
+            {
+                bgmApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GlobalConfig.Instance.AppConfig.BangumiAuthToken);
+            }
+            else if (string.IsNullOrEmpty(GlobalConfig.Instance.AppConfig.BangumiAuthToken) && bgmApiClient.DefaultRequestHeaders.Authorization != null)
+            {
+                bgmApiClient.DefaultRequestHeaders.Authorization = null;
+            }
+
+            var response = await bgmApiClient.GetAsync(url);
+            Logs.LogInfo($"请求: {url} : {response.StatusCode}");
+            if (!response.IsSuccessStatusCode) return null;
+
+            var result = await response.Content.ReadAsStringAsync();
+            jsonData = JsonSerializer.Deserialize<BgmApiJson_SearchListItem>(result);
+        }
+        catch (Exception e)
+        {
+            Logs.LogError(e.ToString());
+            return null;
+        }
+
+        return jsonData;
+    }
 }
