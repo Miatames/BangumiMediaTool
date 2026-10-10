@@ -4,7 +4,7 @@
 使用[BangumiApi](https://github.com/bangumi/api)和[TMDBApi](https://developer.themoviedb.org/docs/getting-started)获取视频信息并生成nfo文件  
 批量重命名字幕文件  
 ass字幕转srt（需要配置ffmpeg路径）（详见Wiki说明）  
-获取视频文件缩略图和进度条预览图  
+获取视频文件缩略图和进度条预览图（需要另外的biftool.exe并添加到系统环境变量）  
 
 ### 测试环境：
 Win11  
@@ -20,3 +20,4 @@ JetBrains Rider 2025.3
 [NaturalSort.Extension](https://github.com/tompazourek/NaturalSort.Extension)  
 [NLog.WPF](https://github.com/limumu1997/NLog.WPF)  
 [WindowsAPICodePack-Shell](https://github.com/aybe/Windows-API-Code-Pack-1.1)  
+[Biftool](https://github.com/rokudev/samples/tree/master/utilities/bif%20tool)  
